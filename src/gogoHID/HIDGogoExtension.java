@@ -33,9 +33,15 @@ public class HIDGogoExtension extends DefaultClassManager implements HidServices
 		pm.addPrimitive("test", new Test() );
 		pm.addPrimitive("beep", new Beep() );
 		pm.addPrimitive("read-sensors", new ReadSensors() );
+		pm.addPrimitive("read-all", new ReadAll() );
 		pm.addPrimitive("led", new LED() );
 		pm.addPrimitive("primitives", new Prims() );
-		pm.addPrimitive("lame",new Lame() );
+		pm.addPrimitive("talk-to-motor",new TalkToMotor() );
+		pm.addPrimitive("set-motor-power", new SetMotorPower() );
+		pm.addPrimitive("motor-on", new MotorOn() );
+		pm.addPrimitive("motor-off", new MotorOff() );
+		pm.addPrimitive("motor-cw", new MotorClockwise() );
+		pm.addPrimitive("motor-countercw", new MotorCounterClockwise() );
 		try { 
 			loadUpHIDServices();
 		} catch (Exception e) {
@@ -78,23 +84,108 @@ public class HIDGogoExtension extends DefaultClassManager implements HidServices
 		}
 	}
 	
-	private class Lame extends DefaultCommand {
+	private class MotorClockwise extends DefaultCommand {
 		@Override
 		public void perform(Argument[] arg0, Context arg1)
 				throws ExtensionException, LogoException {
 			byte[] message = new byte[64];
 			message[0] = (byte)0;
-		    message[1] = (byte)7;  
-		    message[2] = (byte)1;
-		    message[3] = (byte)0;  
-		    
-		    byte[] message2 = new byte[64];
-			message2[0] = (byte)0;
-		    message2[1] = (byte)9;  
-		    message2[2] = (byte)0;
-		    message2[3] = (byte)0;  
-		    message2[4] = (byte)30;  
+		    message[1] = (byte)3;  
+		    message[2] = (byte)0;
+		    message[3] = (byte)1;  //cw
 			
+			if (gogoBoard != null) {
+				gogoBoard.write(message,64, (byte)0);
+			}
+		}
+	}
+	
+	private class MotorCounterClockwise extends DefaultCommand {
+		@Override
+		public void perform(Argument[] arg0, Context arg1)
+				throws ExtensionException, LogoException {
+			byte[] message = new byte[64];
+			message[0] = (byte)0;
+		    message[1] = (byte)3;  
+		    message[2] = (byte)0;
+		    message[3] = (byte)0;  //ccw
+			
+			if (gogoBoard != null) {
+				gogoBoard.write(message,64, (byte)0);
+			}
+		}
+	}
+	
+	private class TalkToMotor extends DefaultCommand {
+		@Override
+		public Syntax getSyntax() {
+			return Syntax.commandSyntax(new int[] {Syntax.NumberType() });
+		}
+		
+		@Override
+		public void perform(Argument[] args, Context ctx)
+				throws ExtensionException, LogoException {
+			int motorNum = args[0].getIntValue();
+			byte[] message = new byte[64];
+			message[0] = (byte)0;
+		    message[1] = (byte)7;  
+		    message[2] = (byte)motorNum;
+		    message[3] = (byte)0;   
+			if (gogoBoard != null) {
+				gogoBoard.write(message,64, (byte)0);
+			}
+		}
+	}
+	
+	private class SetMotorPower extends DefaultCommand {
+		@Override
+		public Syntax getSyntax() {
+			return Syntax.commandSyntax(new int[] {Syntax.NumberType() });
+		}
+		
+		@Override
+		public void perform(Argument[] args, Context ctx)
+				throws ExtensionException, LogoException {
+			int motorPowerVal = args[0].getIntValue();
+			byte[] message = new byte[64];
+			message[0] = (byte)0;
+		    message[1] = (byte)6;
+		    message[2] = (byte)0;
+		    message[3] = (byte)0; //high byte   
+		    message[4] = (byte)motorPowerVal;   
+		    
+			if (gogoBoard != null) {
+				gogoBoard.write(message,64, (byte)0);
+			}
+		}
+	}
+	
+	private class MotorOn extends DefaultCommand {
+		@Override
+		public void perform(Argument[] args, Context ctx)
+				throws ExtensionException, LogoException {
+			byte[] message = new byte[64];
+			message[0] = (byte)0;
+		    message[1] = (byte)2;
+		    message[2] = (byte)0;
+		    message[3] = (byte)1; //on  
+		    
+			if (gogoBoard != null) {
+				gogoBoard.write(message,64, (byte)0);
+			}
+		}
+	}
+	
+	private class MotorOff extends DefaultCommand {
+		@Override
+		public void perform(Argument[] args, Context ctx)
+				throws ExtensionException, LogoException {
+			byte[] message = new byte[64];
+			message[0] = (byte)0;
+		    message[1] = (byte)2;
+		    message[2] = (byte)0;
+		    message[3] = (byte)0; //off  
+		    
 			if (gogoBoard != null) {
 				gogoBoard.write(message,64, (byte)0);
 			}
@@ -127,6 +218,28 @@ public class HIDGogoExtension extends DefaultClassManager implements HidServices
 		}
 	}
 	
+	
+	private class ReadAll extends DefaultReporter {
+		@Override
+		public Syntax getSyntax() {
+	      return Syntax.reporterSyntax(Syntax.ListType());
+	    }
+		
+		@Override
+		public Object report(Argument[] arg0, Context arg1)
+				throws ExtensionException, LogoException {
+			byte[] data = new byte[64];
+			if (gogoBoard != null) {
+				gogoBoard.read(data, 200);
+			}
+			LogoListBuilder llb = new LogoListBuilder();
+			for (int i = 0; i< data.length; i++) {
+				llb.add( Double.valueOf(data[i]) );
+			}
+			return llb.toLogoList();
+		}
+	}
+	
 	private class ReadSensors extends DefaultReporter {
 		@Override
 		public Syntax getSyntax() {
@@ -139,7 +252,7 @@ public class HIDGogoExtension extends DefaultClassManager implements HidServices
 			short[] sensors = new short[8];
 			if (gogoBoard != null) {
 				byte[] data = new byte[64];
-				gogoBoard.read(data, 100);
+				gogoBoard.read(data, 200);
 				for (int index = 0; index < 8; index++) {
 					ByteBuffer bb = ByteBuffer.wrap(data,(2*index) + 1,2 );
 					bb.order(ByteOrder.BIG_ENDIAN);
@@ -170,6 +283,8 @@ public class HIDGogoExtension extends DefaultClassManager implements HidServices
 			llb.add("read-sensors <returns all 8 sensor values in a list>");
 			llb.add("test <returns number of HID gogos currently connected>");
 			llb.add("primitives <this command, returns prims listing>");
+			llb.add("talk-to-motor <motor number(s) to talk to -- 1,2,4,8 and bitwise or");
+			llb.add("set-motor-power <power value 0-100%>");
 			return llb.toLogoList();
 		}
 	}
