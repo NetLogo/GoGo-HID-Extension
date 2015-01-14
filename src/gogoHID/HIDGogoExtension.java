@@ -94,14 +94,14 @@ public class HIDGogoExtension extends DefaultClassManager implements HidServices
 			llb.add("beep");
 			llb.add("led <0 off 1 on> {refers to the user LED (yellow)");
 			llb.add("talk-to-motor <motor number(s) to talk to -- 1,2,4,8 and bitwise or> {also activates associated servo}");
-			llb.add("motor-set-power <power value 0-100%>");
+			llb.add("motor-set-power <power value 0-100> {0 = full off; 100 = full on.  Sets board value to <power>% of 255.}");
 			llb.add("motor-on {turns current motor (see talk-to-motor) on}");
 			llb.add("motor-off {turns current motor (see talk-to-motor) off}");
 			llb.add("motor-clockwise {makes current motor (see talk-to-motor) go clockwise}");
 			llb.add("motor-counterclockwise {makes current motor (see talk-to-motor) go counterclockwise}");
-			llb.add("set-servo <position> {makes current servo (see talk-to-motor) move to position}");
+			llb.add("set-servo <position> {makes current servo (see talk-to-motor) move to position <position> 0-255}");
 			llb.add("----utility functions---");
-			llb.add("read-all <returns entire byte sequence of HID device's status message>");
+			llb.add("read-all <returns entire byte sequence of HID device's status message> {converts to byte digits to hex strings}");
 			llb.add("send-bytes <sends any byte sequence to the gogo> {list of integers will get padded out with zeroes.}");
 			llb.add("howmany-gogos <returns number of HID gogos currently connected>");
 			return llb.toLogoList();
@@ -218,9 +218,8 @@ public class HIDGogoExtension extends DefaultClassManager implements HidServices
 		    message[1] = (byte)6;
 		    message[2] = (byte)0;
 		    message[3] = (byte)0; //high byte   
-		    message[4] = (byte)motorPowerVal;   
-		    
-			if (gogoBoard != null) {
+		    message[4] = (byte)motorPowerVal; 
+		    if (gogoBoard != null) {
 				gogoBoard.write(message,64, (byte)0);
 			}
 		}
@@ -353,7 +352,7 @@ public class HIDGogoExtension extends DefaultClassManager implements HidServices
 			}
 			LogoListBuilder llb = new LogoListBuilder();
 			for (int i = 0; i< data.length; i++) {
-				llb.add( Double.valueOf(data[i]) );
+				llb.add( byteToHex(data[i]) );
 			}
 			return llb.toLogoList();
 		}
@@ -376,6 +375,17 @@ public class HIDGogoExtension extends DefaultClassManager implements HidServices
 	}
 	
 
+	//utility.  converts a single byte to a 2-digit hex string representation.
+	final private static char[] hexArray = "0123456789ABCDEF".toCharArray();
+	public String byteToHex(byte b) {
+	    char[] hexChars = new char[2];
+
+        int v = b & 0xFF;
+        hexChars[0] = hexArray[v >>> 4];
+        hexChars[1] = hexArray[v & 0x0F];
+    
+	    return new String(hexChars);
+	}
 	
 	//Attach and detach events
 	@Override
