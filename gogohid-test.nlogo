@@ -3,7 +3,9 @@ extensions [ gogohid ]
 globals [ sensors ]
 
 to startup 
+  ca
   set sensors [0 0 0 0 0 0 0 0]
+  reset-ticks
 end
 
 to update-sensors
@@ -228,10 +230,10 @@ HORIZONTAL
 BUTTON
 694
 262
-943
+951
 295
 NIL
-gogohid:talk-to-motor motor-num
+gogohid:talk-to-output-ports motor-string
 NIL
 1
 T
@@ -245,13 +247,13 @@ NIL
 INPUTBOX
 695
 303
-850
+930
 363
-motor-num
-15
+motor-string
+XCDa
 1
 0
-Number
+String
 
 BUTTON
 705
@@ -371,10 +373,10 @@ NIL
 HORIZONTAL
 
 BUTTON
-899
-338
-1191
-371
+941
+336
+1188
+369
 NIL
 every .2 [\ngogohid:set-servo servo-value\n]
 T
@@ -402,6 +404,69 @@ BUTTON
 prim listing
 clear-output\nforeach gogohid:primitives [\noutput-print ?\n]
 NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+265
+267
+538
+300
+NIL
+show gogohid:read-sensor sensornum
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+INPUTBOX
+387
+196
+453
+256
+sensornum
+2
+1
+0
+Number
+
+PLOT
+331
+65
+531
+215
+plot 1
+NIL
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" "plot gogohid:read-sensor sensornum"
+
+BUTTON
+323
+331
+386
+364
+NIL
+tick
+T
 1
 T
 OBSERVER
