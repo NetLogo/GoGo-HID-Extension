@@ -51,11 +51,12 @@ public class HIDGogoExtension extends DefaultClassManager implements HidServices
 		pm.addPrimitive("primitives", new Prims() );
 		
 		pm.addPrimitive("read-sensors", new ReadSensors() );
+		pm.addPrimitive("read-sensor", new ReadSensorNumber() );
 		
 		pm.addPrimitive("beep", new Beep() );
 		pm.addPrimitive("led", new LED() );
 		
-		pm.addPrimitive("talk-to-motor",new TalkToMotor() );
+		pm.addPrimitive("talk-to-output-ports",new TalkToMotor() );
 		pm.addPrimitive("motor-set-power", new SetMotorPower() );
 		pm.addPrimitive("motor-on", new MotorOn() );
 		pm.addPrimitive("motor-off", new MotorOff() );
@@ -89,17 +90,18 @@ public class HIDGogoExtension extends DefaultClassManager implements HidServices
 			LogoListBuilder llb = new LogoListBuilder();
 			llb.add("primitives <this command, returns prims listing>");
 			llb.add("----reading (inputs)---");
-			llb.add("read-sensors <returns all 8 sensor values in a list>");
-			llb.add("----writing (inputs)---");
+			llb.add("read-sensors {returns all 8 sensor values in a list}");
+			llb.add("read-sensor <number> {number should be between 1 and 8 inclusive}");
+			llb.add("----writing (outputs)---");
 			llb.add("beep");
 			llb.add("led <0 off 1 on> {refers to the user LED (yellow)");
-			llb.add("talk-to-motor <motor number(s) to talk to -- 1,2,4,8 and bitwise or> {also activates associated servo}");
-			llb.add("motor-set-power <power value 0-100> {0 = full off; 100 = full on.  Sets board value to <power>% of 255.}");
-			llb.add("motor-on {turns current motor (see talk-to-motor) on}");
-			llb.add("motor-off {turns current motor (see talk-to-motor) off}");
-			llb.add("motor-clockwise {makes current motor (see talk-to-motor) go clockwise}");
-			llb.add("motor-counterclockwise {makes current motor (see talk-to-motor) go counterclockwise}");
-			llb.add("set-servo <position> {makes current servo (see talk-to-motor) move to position <position> 0-255}");
+			llb.add("talk-to-output-ports <output letter(s) to talk to> {e.g, A for port A, ABD for ports A, B, and D}");
+			llb.add("motor-set-power <power value 0-100 for current motor (see talk-to-output-ports)> {0 = full off; 100 = full on.  Sets board value to <power>% of 255.}");
+			llb.add("motor-on {turns current motor (see talk-to-output-ports) on}");
+			llb.add("motor-off {turns current motor (see talk-to-output-ports) off}");
+			llb.add("motor-clockwise {makes current motor (see talk-to-output-ports) go clockwise}");
+			llb.add("motor-counterclockwise {makes current motor (see talk-to-output-ports) go counterclockwise}");
+			llb.add("set-servo <position> {makes current servo (see talk-to-output-ports) move to position <position> 0-255}");
 			llb.add("----utility functions---");
 			llb.add("read-all <returns entire byte sequence of HID device's status message> {converts to byte digits to hex strings}");
 			llb.add("send-bytes <sends any byte sequence to the gogo> {list of integers will get padded out with zeroes.}");
@@ -135,6 +137,32 @@ public class HIDGogoExtension extends DefaultClassManager implements HidServices
 		}
 	}
 	
+	private class ReadSensorNumber extends DefaultReporter {
+		@Override
+		public Syntax getSyntax() {
+	      return Syntax.reporterSyntax(new int[] {Syntax.NumberType() }, Syntax.NumberType());
+	    }
+		
+		@Override
+		public Object report(Argument[] args, Context arg1)
+				throws ExtensionException, LogoException {
+			int sensorNumber = args[0].getIntValue();
+			if ((sensorNumber > 8) || (sensorNumber < 1)) {
+				throw new ExtensionException("Sensor Number must be between 1 and 8 (inclusive).  You entered " + sensorNumber);
+			}
+			Short sensorReading = 0;
+			if (gogoBoard != null) {
+				byte[] data = new byte[64];
+				gogoBoard.read(data, 200);
+				
+				ByteBuffer bb = ByteBuffer.wrap(data,(2*(sensorNumber-1)) + 1,2 );
+				bb.order(ByteOrder.BIG_ENDIAN);
+				sensorReading = bb.getShort();
+			}
+			
+			return sensorReading.doubleValue();
+		}
+	}
 		
 	
 	private class Beep extends DefaultCommand {
@@ -184,17 +212,28 @@ public class HIDGogoExtension extends DefaultClassManager implements HidServices
 	private class TalkToMotor extends DefaultCommand {
 		@Override
 		public Syntax getSyntax() {
-			return Syntax.commandSyntax(new int[] {Syntax.NumberType() });
+			return Syntax.commandSyntax(new int[] {Syntax.StringType() });
 		}
 		
 		@Override
 		public void perform(Argument[] args, Context ctx)
 				throws ExtensionException, LogoException {
-			int motorNum = args[0].getIntValue();
+			
+			String motors = args[0].getString();
+			int motorMask = 0;
+			if ( motors.contains("a") || motors.contains("A") )
+				motorMask = motorMask  | 1;
+			if ( motors.contains("b") || motors.contains("B") )
+				motorMask = motorMask  | 2;
+			if ( motors.contains("c") || motors.contains("C") )
+				motorMask = motorMask  | 4;
+			if ( motors.contains("d") || motors.contains("D") )
+				motorMask = motorMask  | 8;
+			
 			byte[] message = new byte[64];
 			message[0] = (byte)0;
 		    message[1] = (byte)7;  
-		    message[2] = (byte)motorNum;
+		    message[2] = (byte)motorMask;
 		    message[3] = (byte)0;   
 			if (gogoBoard != null) {
 				gogoBoard.write(message,64, (byte)0);
