@@ -25,7 +25,6 @@ import org.nlogo.api.Syntax;
 public class HIDGogoExtension extends DefaultClassManager implements HidServicesListener {
 	
 	private HidServices hidServices;
-	private int numInitialDevices = 0;
 	private HidDevice gogoBoard;
 	
 
@@ -34,12 +33,10 @@ public class HIDGogoExtension extends DefaultClassManager implements HidServices
 	    hidServices = HidManager.getHidServices();
 	    hidServices.addHidServicesListener(this);
 
-	    numInitialDevices = 0;
 	    // Provide a list of attached devices
 	    for (HidDeviceInfo hidDeviceInfo : hidServices.getAttachedHidDevices()) {
 	      System.out.println(hidDeviceInfo);
 	      if (hidDeviceInfo.getVendorId() == 0x461 && hidDeviceInfo.getProductId() == 0x20) {
-	    	  numInitialDevices++;
 	    	  //store a gogo as gogo (limitation of current implementation -- only allow one gogo)
 	    	  gogoBoard = hidServices.getHidDevice(0x461, 0x20, null);
 	      }
@@ -403,13 +400,13 @@ public class HIDGogoExtension extends DefaultClassManager implements HidServices
 		@Override
 		public Object report(Argument[] arg0, Context arg1)
 				throws ExtensionException, LogoException {
-			numInitialDevices = 0;
+			Integer numDevices = 0;
 			for (HidDeviceInfo hidDeviceInfo : hidServices.getAttachedHidDevices()) {
 		      if (hidDeviceInfo.getVendorId() == 0x461 && hidDeviceInfo.getProductId() == 0x20) {
-		    	  numInitialDevices++;
+		    	  numDevices++;
 		      }
 		    }
-			return "There are " + numInitialDevices + " attached HID device(s) with the correct vendor / product ids for a GoGo...";
+			return numDevices.doubleValue();
 		}
 	}
 	
@@ -425,6 +422,7 @@ public class HIDGogoExtension extends DefaultClassManager implements HidServices
     
 	    return new String(hexChars);
 	}
+	
 	
 	//Attach and detach events
 	@Override
@@ -455,15 +453,4 @@ public class HIDGogoExtension extends DefaultClassManager implements HidServices
 	}
 
 	
-	//For testing connectivity without NetLogo
-	public static void main(String[] args) {
-		HIDGogoExtension hge = new HIDGogoExtension();
-		try {
-			hge.loadUpHIDServices();
-		} catch (HidException e) {
-			System.err.println("error in loading up services:");
-			e.printStackTrace();
-		}
-		System.err.println("THERE IS / ARE " + hge.numInitialDevices + " GoGo device(s). ");
-	}
 }
