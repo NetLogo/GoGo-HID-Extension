@@ -18,7 +18,7 @@ SRCS=$(wildcard src/**/*.java)
 
 gogo.jar gogo.jar.pack.gz: $(SRCS) manifest.txt Makefile
 	mkdir -p classes
-	$(JAVAC) -g -deprecation -Xlint:all -Xlint:-serial -Xlint:-path -encoding us-ascii -source 1.5 -target 1.5 -classpath $(NETLOGO)/NetLogoLite.jar:hid4java.jar:jna.jar -d classes $(SRCS)
+	$(JAVAC) -g -deprecation -Xlint:all -Xlint:-serial -Xlint:-path -encoding us-ascii -source 1.5 -target 1.5 -classpath $(NETLOGO)/NetLogoLite.jar:$(NETLOGO)/NetLogo.jar:hid4java.jar:jna.jar -d classes $(SRCS)
 	jar cmf manifest.txt gogo.jar -C classes .
 	pack200 --modification-time=latest --effort=9 --strip-debug --no-keep-file-order --unknown-attribute=strip gogo.jar.pack.gz gogo.jar
 

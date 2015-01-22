@@ -27,6 +27,7 @@ public class HIDGogoExtension extends DefaultClassManager implements HidServices
 	private HidServices hidServices;
 	private HidDevice gogoBoard;
 	
+  private boolean shownErrorMessage = false;
 
 	private void loadUpHIDServices() throws HidException  {
 		// Get HID services and store
@@ -42,6 +43,56 @@ public class HIDGogoExtension extends DefaultClassManager implements HidServices
 	      }
 	    }
 	}
+
+  private void alertToNewGogoBoards(String primitiveName) {
+    if(!shownErrorMessage) {
+      while(true) {
+        final int choice =
+            org.nlogo.swing.OptionDialog.show
+                (org.nlogo.app.App.app().frame(),
+                    "GoGo Extension has been updated!",
+                    "This model is using a primitive (gogo:" + primitiveName + ") from the old version of the GoGo extension.  Use gogo-serial for older GoGo boards.  Your model will likely throw errors.",
+                    new String[]{"More Information", "Close"});
+        if (choice == 1) {
+          break;
+        }
+        org.nlogo.swing.BrowserLauncher.openURL
+          (org.nlogo.app.App.app().frame(), "https://github.com/NetLogo/NetLogo/wiki/GoGo-Upgrade", false);
+      }
+      shownErrorMessage = true;
+    }
+  }
+
+  private class OldReporter extends DefaultReporter {
+    private Syntax syntax;
+    private String primitiveName;
+
+    private OldReporter(String primitiveName, Syntax syntax) {
+      this.syntax = syntax;
+      this.primitiveName = primitiveName;
+    }
+
+    public Syntax getSyntax() { return syntax; }
+    public Object report(Argument args[], Context context) {
+      alertToNewGogoBoards(primitiveName);
+      return null;
+    }
+  }
+
+  private class OldCommand extends DefaultCommand {
+    private Syntax syntax;
+    private String primitiveName;
+
+    private OldCommand(String primitiveName, Syntax syntax) {
+      this.syntax = syntax;
+      this.primitiveName = primitiveName;
+    }
+
+    public Syntax getSyntax() { return syntax; }
+    public void perform(Argument args[], Context context) {
+      alertToNewGogoBoards(primitiveName);
+    }
+  }
 
 	@Override
 	public void load(PrimitiveManager pm) throws ExtensionException {
@@ -65,6 +116,29 @@ public class HIDGogoExtension extends DefaultClassManager implements HidServices
 		pm.addPrimitive("read-all", new ReadAll() );
 		pm.addPrimitive("send-bytes", new SendBytes() );
 		pm.addPrimitive("howmany-gogos", new Enumerate() );
+
+    // Old Primitives that should let you know we've changed the extension
+    pm.addPrimitive("ports", new OldReporter("ports", Syntax.reporterSyntax(Syntax.ListType())));
+    pm.addPrimitive("burst-value", new OldReporter("burst-value", Syntax.reporterSyntax(new int[] {Syntax.NumberType()}, Syntax.NumberType())));
+    pm.addPrimitive("close", new OldCommand("close", Syntax.commandSyntax()));
+    pm.addPrimitive("install", new OldCommand("install", Syntax.commandSyntax()));
+    pm.addPrimitive("led-off", new OldCommand("led-off", Syntax.commandSyntax()));
+    pm.addPrimitive("led-on", new OldCommand("led-on", Syntax.commandSyntax()));
+    pm.addPrimitive("open", new OldCommand("open", Syntax.commandSyntax(new int[] {Syntax.StringType()})));
+    pm.addPrimitive("open?", new OldReporter("open?", Syntax.reporterSyntax(Syntax.BooleanType())));
+    pm.addPrimitive("output-port-coast", new OldCommand("output-port-coast", Syntax.commandSyntax()));
+    pm.addPrimitive("output-port-off", new OldCommand("output-port-off", Syntax.commandSyntax()));
+    pm.addPrimitive("output-port-on", new OldCommand("output-port-on", Syntax.commandSyntax()));
+    pm.addPrimitive("output-port-reverse", new OldCommand("output-port-reverse", Syntax.commandSyntax()));
+    pm.addPrimitive("output-port-thatway", new OldCommand("output-port-thatway", Syntax.commandSyntax()));
+    pm.addPrimitive("output-port-thisway", new OldCommand("output-port-thisway", Syntax.commandSyntax()));
+    pm.addPrimitive("ping", new OldReporter("ping", Syntax.reporterSyntax(Syntax.BooleanType())));
+    pm.addPrimitive("ports", new OldReporter("ports", Syntax.reporterSyntax(Syntax.ListType())));
+    pm.addPrimitive("sensor", new OldReporter("sensor", Syntax.reporterSyntax(new int[] {Syntax.NumberType()}, Syntax.NumberType())));
+    pm.addPrimitive("set-burst-mode", new OldCommand("set-burst-mode", Syntax.commandSyntax(new int[] {Syntax.ListType(), Syntax.BooleanType()})));
+    pm.addPrimitive("set-output-port-power", new OldCommand("set-output-port-power", Syntax.commandSyntax(new int[] {Syntax.NumberType()})));
+    pm.addPrimitive("stop-burst-mode", new OldCommand("stop-burst-mode", Syntax.commandSyntax()));
+
 		try { 
 			loadUpHIDServices();
 		} catch (Exception e) {
@@ -209,23 +283,37 @@ public class HIDGogoExtension extends DefaultClassManager implements HidServices
 	private class TalkToMotor extends DefaultCommand {
 		@Override
 		public Syntax getSyntax() {
-			return Syntax.commandSyntax(new int[] {Syntax.StringType() });
+			return Syntax.commandSyntax(new int[] {Syntax.ListType() });
 		}
 		
 		@Override
-		public void perform(Argument[] args, Context ctx)
-				throws ExtensionException, LogoException {
-			
-			String motors = args[0].getString();
+    public void perform(Argument args[], Context context)
+        throws ExtensionException, org.nlogo.api.LogoException {
+      java.util.Iterator<?> iter = args[0].getList().iterator();
+      int outputPortMask = 0;
+
 			int motorMask = 0;
-			if ( motors.contains("a") || motors.contains("A") )
-				motorMask = motorMask  | 1;
-			if ( motors.contains("b") || motors.contains("B") )
-				motorMask = motorMask  | 2;
-			if ( motors.contains("c") || motors.contains("C") )
-				motorMask = motorMask  | 4;
-			if ( motors.contains("d") || motors.contains("D") )
-				motorMask = motorMask  | 8;
+      while (iter.hasNext()) {
+        Object val = iter.next();
+        switch (val.toString().toLowerCase().charAt(0)) {
+          case 'a':
+          case 'A':
+				    motorMask = motorMask  | 1;
+            break;
+          case 'b':
+          case 'B':
+				    motorMask = motorMask  | 2;
+            break;
+          case 'c':
+          case 'C':
+				    motorMask = motorMask  | 4;
+            break;
+          case 'd':
+          case 'D':
+				    motorMask = motorMask  | 8;
+            break;
+        }
+      }
 			
 			byte[] message = new byte[64];
 			message[0] = (byte)0;
