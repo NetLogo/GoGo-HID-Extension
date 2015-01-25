@@ -290,7 +290,6 @@ public class HIDGogoExtension extends DefaultClassManager implements HidServices
     public void perform(Argument args[], Context context)
         throws ExtensionException, org.nlogo.api.LogoException {
       java.util.Iterator<?> iter = args[0].getList().iterator();
-      int outputPortMask = 0;
 
 			int motorMask = 0;
       while (iter.hasNext()) {
