@@ -96,6 +96,7 @@ public class HIDGogoExtension extends DefaultClassManager implements HidServices
 
 	@Override
 	public void load(PrimitiveManager pm) throws ExtensionException {
+		
 		pm.addPrimitive("primitives", new Prims() );
 		
 		pm.addPrimitive("read-sensors", new ReadSensors() );
@@ -138,7 +139,7 @@ public class HIDGogoExtension extends DefaultClassManager implements HidServices
     pm.addPrimitive("set-burst-mode", new OldCommand("set-burst-mode", Syntax.commandSyntax(new int[] {Syntax.ListType(), Syntax.BooleanType()})));
     pm.addPrimitive("set-output-port-power", new OldCommand("set-output-port-power", Syntax.commandSyntax(new int[] {Syntax.NumberType()})));
     pm.addPrimitive("stop-burst-mode", new OldCommand("stop-burst-mode", Syntax.commandSyntax()));
-
+	
 		try { 
 			loadUpHIDServices();
 		} catch (Exception e) {
@@ -146,6 +147,7 @@ public class HIDGogoExtension extends DefaultClassManager implements HidServices
 			e.printStackTrace();
 			throw new ExtensionException("Error in loading HID services");
 		}
+			
 	}
 	
 	
@@ -166,7 +168,7 @@ public class HIDGogoExtension extends DefaultClassManager implements HidServices
 			llb.add("----writing (outputs)---");
 			llb.add("beep");
 			llb.add("led <0 off 1 on> {refers to the user LED (yellow)");
-			llb.add("talk-to-output-ports <output letter(s) to talk to> {e.g, A for port A, ABD for ports A, B, and D}");
+			llb.add("talk-to-output-ports <List of output letter(s) to talk to> {e.g, [\"A\"] for port A, [\"A\" \"B\" \"D\" ] for ports A, B, and D}");
 			llb.add("motor-set-power <power value 0-100 for current motor (see talk-to-output-ports)> {0 = full off; 100 = full on.  Sets board value to <power>% of 255.}");
 			llb.add("motor-on {turns current motor (see talk-to-output-ports) on}");
 			llb.add("motor-off {turns current motor (see talk-to-output-ports) off}");
