@@ -2,3 +2,5 @@ gogo.jar
 gogo.jar.pack.gz
 classes
 gogo-daemon.jar
+NetLogo.jar
+NetLogoHeadless.jar
