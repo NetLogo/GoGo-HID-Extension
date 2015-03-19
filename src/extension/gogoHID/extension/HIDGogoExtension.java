@@ -87,11 +87,11 @@ public class HIDGogoExtension extends DefaultClassManager {
     pm.addPrimitive("led", new LED() );
     
     pm.addPrimitive("talk-to-output-ports",new TalkToMotor() );
-    pm.addPrimitive("motor-set-power", new SetMotorPower() );
-    pm.addPrimitive("motor-on", new MotorOn() );
-    pm.addPrimitive("motor-off", new MotorOff() );
-    pm.addPrimitive("motor-clockwise", new MotorClockwise() );
-    pm.addPrimitive("motor-counterclockwise", new MotorCounterClockwise() );
+    pm.addPrimitive("set-output-port-power", new SetOutputPortPower() );
+    pm.addPrimitive("output-port-on", new OutputPortOn() );
+    pm.addPrimitive("output-port-off", new OutputPortOff() );
+    pm.addPrimitive("output-port-clockwise", new OutputPortClockwise() );
+    pm.addPrimitive("output-port-counterclockwise", new OutputPortCounterClockwise() );
     
     pm.addPrimitive("set-servo", new SetServo() );
     
@@ -109,16 +109,12 @@ public class HIDGogoExtension extends DefaultClassManager {
     pm.addPrimitive("open", new OldCommand("open", Syntax.commandSyntax(new int[] {Syntax.StringType()})));
     pm.addPrimitive("open?", new OldReporter("open?", Syntax.reporterSyntax(Syntax.BooleanType())));
     pm.addPrimitive("output-port-coast", new OldCommand("output-port-coast", Syntax.commandSyntax()));
-    pm.addPrimitive("output-port-off", new OldCommand("output-port-off", Syntax.commandSyntax()));
-    pm.addPrimitive("output-port-on", new OldCommand("output-port-on", Syntax.commandSyntax()));
     pm.addPrimitive("output-port-reverse", new OldCommand("output-port-reverse", Syntax.commandSyntax()));
     pm.addPrimitive("output-port-thatway", new OldCommand("output-port-thatway", Syntax.commandSyntax()));
     pm.addPrimitive("output-port-thisway", new OldCommand("output-port-thisway", Syntax.commandSyntax()));
     pm.addPrimitive("ping", new OldReporter("ping", Syntax.reporterSyntax(Syntax.BooleanType())));
-    pm.addPrimitive("ports", new OldReporter("ports", Syntax.reporterSyntax(Syntax.ListType())));
     pm.addPrimitive("sensor", new OldReporter("sensor", Syntax.reporterSyntax(new int[] {Syntax.NumberType()}, Syntax.NumberType())));
     pm.addPrimitive("set-burst-mode", new OldCommand("set-burst-mode", Syntax.commandSyntax(new int[] {Syntax.ListType(), Syntax.BooleanType()})));
-    pm.addPrimitive("set-output-port-power", new OldCommand("set-output-port-power", Syntax.commandSyntax(new int[] {Syntax.NumberType()})));
     pm.addPrimitive("stop-burst-mode", new OldCommand("stop-burst-mode", Syntax.commandSyntax()));
   
     try { 
@@ -401,7 +397,7 @@ public class HIDGogoExtension extends DefaultClassManager {
   }
   
   
-  private class SetMotorPower extends DefaultCommand {
+  private class SetOutputPortPower extends DefaultCommand {
     @Override
     public Syntax getSyntax() {
       return Syntax.commandSyntax(new int[] {Syntax.NumberType() });
@@ -422,7 +418,7 @@ public class HIDGogoExtension extends DefaultClassManager {
   }
   
   
-  private class MotorOn extends DefaultCommand {
+  private class OutputPortOn extends DefaultCommand {
     @Override
     public void perform(Argument[] args, Context ctx)
         throws ExtensionException, LogoException {
@@ -436,7 +432,7 @@ public class HIDGogoExtension extends DefaultClassManager {
   }
   
   
-  private class MotorOff extends DefaultCommand {
+  private class OutputPortOff extends DefaultCommand {
     @Override
     public void perform(Argument[] args, Context ctx)
         throws ExtensionException, LogoException {
@@ -451,7 +447,7 @@ public class HIDGogoExtension extends DefaultClassManager {
   }
   
 
-  private class MotorClockwise extends DefaultCommand {
+  private class OutputPortClockwise extends DefaultCommand {
     @Override
     public void perform(Argument[] arg0, Context arg1)
         throws ExtensionException, LogoException {
@@ -465,7 +461,7 @@ public class HIDGogoExtension extends DefaultClassManager {
     }
   }
   
-  private class MotorCounterClockwise extends DefaultCommand {
+  private class OutputPortCounterClockwise extends DefaultCommand {
     @Override
     public void perform(Argument[] arg0, Context arg1)
         throws ExtensionException, LogoException {
