@@ -86,7 +86,7 @@ public class HIDGogoExtension extends DefaultClassManager {
     
     pm.addPrimitive("led", new LED() );
     
-    pm.addPrimitive("talk-to-output-ports",new TalkToMotor() );
+    pm.addPrimitive("talk-to-output-ports",new TalkToOutputPort() );
     pm.addPrimitive("set-output-port-power", new SetOutputPortPower() );
     pm.addPrimitive("output-port-on", new OutputPortOn() );
     pm.addPrimitive("output-port-off", new OutputPortOff() );
@@ -245,11 +245,11 @@ public class HIDGogoExtension extends DefaultClassManager {
       llb.add("beep");
       llb.add("led <0 off 1 on> {refers to the user LED (yellow)");
       llb.add("talk-to-output-ports <List of output letter(s) to talk to> {e.g, [\"A\"] for port A, [\"A\" \"B\" \"D\" ] for ports A, B, and D}");
-      llb.add("motor-set-power <power value 0-100 for current motor (see talk-to-output-ports)> {0 = full off; 100 = full on.  Sets board value to <power>% of 255.}");
-      llb.add("motor-on {turns current motor (see talk-to-output-ports) on}");
-      llb.add("motor-off {turns current motor (see talk-to-output-ports) off}");
-      llb.add("motor-clockwise {makes current motor (see talk-to-output-ports) go clockwise}");
-      llb.add("motor-counterclockwise {makes current motor (see talk-to-output-ports) go counterclockwise}");
+      llb.add("set-output-port-power <power value 0-100 for current output-port (see talk-to-output-ports)> {0 = full off; 100 = full on.  Sets board value to <power>% of 255.}");
+      llb.add("output-port-on {turns current output-port (see talk-to-output-ports) on}");
+      llb.add("output-port-off {turns current output-port (see talk-to-output-ports) off}");
+      llb.add("output-port-clockwise {makes current output-port (see talk-to-output-ports) go clockwise}");
+      llb.add("output-port-counterclockwise {makes current output-port (see talk-to-output-ports) go counterclockwise}");
       llb.add("set-servo <position> {makes current servo (see talk-to-output-ports) move to position <position> 0-255}");
       llb.add("----utility functions---");
       llb.add("read-all <returns entire byte sequence of HID device's status message> {converts to byte digits to hex strings}");
@@ -353,7 +353,7 @@ public class HIDGogoExtension extends DefaultClassManager {
   }
   
   
-  private class TalkToMotor extends DefaultCommand {
+  private class TalkToOutputPort extends DefaultCommand {
     @Override
     public Syntax getSyntax() {
       return Syntax.commandSyntax(new int[] {Syntax.ListType() });
@@ -364,25 +364,25 @@ public class HIDGogoExtension extends DefaultClassManager {
         throws ExtensionException, org.nlogo.api.LogoException {
       java.util.Iterator<?> iter = args[0].getList().iterator();
 
-      int motorMask = 0;
+      int outputPortMask = 0;
       while (iter.hasNext()) {
         Object val = iter.next();
         switch (val.toString().toLowerCase().charAt(0)) {
           case 'a':
           case 'A':
-            motorMask = motorMask  | 1;
+            outputPortMask = outputPortMask  | 1;
             break;
           case 'b':
           case 'B':
-            motorMask = motorMask  | 2;
+            outputPortMask = outputPortMask  | 2;
             break;
           case 'c':
           case 'C':
-            motorMask = motorMask  | 4;
+            outputPortMask = outputPortMask  | 4;
             break;
           case 'd':
           case 'D':
-            motorMask = motorMask  | 8;
+            outputPortMask = outputPortMask  | 8;
             break;
         }
       }
@@ -390,7 +390,7 @@ public class HIDGogoExtension extends DefaultClassManager {
       byte[] message = new byte[64];
       message[0] = (byte)0;
       message[1] = (byte)7;  
-      message[2] = (byte)motorMask;
+      message[2] = (byte)outputPortMask;
       message[3] = (byte)0;   
       sendMessage(message);
     }
@@ -406,13 +406,13 @@ public class HIDGogoExtension extends DefaultClassManager {
     @Override
     public void perform(Argument[] args, Context ctx)
         throws ExtensionException, LogoException {
-      int motorPowerVal = args[0].getIntValue();
+      int outputPortPowerVal = args[0].getIntValue();
       byte[] message = new byte[64];
       message[0] = (byte)0;
       message[1] = (byte)6;
       message[2] = (byte)0;
       message[3] = (byte)0; //high byte   
-      message[4] = (byte)motorPowerVal; 
+      message[4] = (byte)outputPortPowerVal; 
       sendMessage(message);
     }
   }
