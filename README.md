@@ -12,13 +12,13 @@ https://github.com/NetLogo/GoGo-HID-Extension.
 
 - [primitives](#primitives), [howmany-gogos](#howmany-gogos)
 
-[Motors and Servos](#motors-and-servos)
+[5v Outputs and Servos](#motors-and-servos)
 
-- [talk-to-output-ports](#talk-to-output-ports), [motor-set-power](#motor-set-power), [motor-on](#motor-on), [motor-off](#motor-off), [motor-clockwise](#motor-clockwise), [motor-counterclockwise](#motor-counterclockwise), [set-servo](#set-servo)
+- [talk-to-output-ports](#talk-to-output-ports), [set-output-port-power](#set-output-port-power), [output-port-on](#output-port-on), [output-port-off](#output-port-off), [output-port-clockwise](#output-port-clockwise), [output-port-counterclockwise](#output-port-counterclockwise), [set-servo](#set-servo)
 
 [Other Outputs](#other-outputs)
 
-- [led](#v), [beep](#beep)
+- [led](#led), [beep](#beep)
 
 [Sensors](#sensors)
 
@@ -74,7 +74,7 @@ Returns a list of the primitives of this extension.
 
 Reports the number of USB HID devices visible to the computer and having the correct vendor and product ID to be a GoGo board.  A board will only be detected if it is both connected and powered on.  Using this primitive is one way to determine quickly whether a GoGo board has the HID firmware loaded. (A USB-Serial version of the board will not be detected.).
 
-### Motors and Servos
+### 5v Outputs and Servos
 
 
 #### talk-to-output-ports 
@@ -84,32 +84,32 @@ Reports the number of USB HID devices visible to the computer and having the cor
 Establishes the context of 
 
 
-#### motor-set-power
+#### set-output-port-power
 
-`gogo:motor-set-power _power-level_`
+`gogo:set-output-port-power _power-level_`
 
-Sets the amount of power that will be fed to the motor ports indicated in talk-to-output-ports.  This will not affect the on-off state of the output ports.  So, if a motor is already running, changing its power will change its speed.  If a motor is not running, changing the power level will not turn it on; instead, it will affect the speed at which the motor starts when it is turned on with motor-on.
+The argument is a number between 0 and 100, reflecting the percentage of maximum power.  Sets the amount of power that will be fed to the output ports indicated in talk-to-output-ports. This will not affect the on-off state of the output ports.  So, for example, if a motor is already connected to an output port and running, changing its power will change its speed.  If the motor is not running, changing the power level will not turn it on; instead, it will affect the speed at which the motor starts when it is turned on with output-port-on.
 
-#### motor-on
+#### output-port-on
 
-`gogo:motor-on`
+`gogo:output-port-on`
 
-Turns on the motor ports which have been indicated with talk-to-output-ports. If none have been set with talk-to-output-ports, no motor ports will be turned on.
+Turns on the output ports which have been indicated with talk-to-output-ports. If none have been set with talk-to-output-ports, no ports will be turned on.
 
-#### motor-off
+#### output-port-off
 
-`gogo:motor-off`
+`gogo:output-port-off`
 
-Turns off the motor ports which have been indicated with talk-to-output-ports. If none have been set with talk-to-output-ports, no motor ports will be turned off.
+Turns off the output ports which have been indicated with talk-to-output-ports. If none have been set with talk-to-output-ports, no ports will be turned off.
 
-#### motor-clockwise
+#### output-port-clockwise
 
-`gogo:motor-clockwise`
+`gogo:output-port-clockwise`
 
 
-#### motor-counterclockwise
+#### output-port-counterclockwise
 
-`gogo:motor-counterclockwise`
+`gogo:output-port-counterclockwise`
 
 
 #### set-servo
