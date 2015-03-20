@@ -1,6 +1,6 @@
 # The NetLogo GoGo Extension for sensors and robotics
 
-This is the new extension for physical computing, using sensors, motors, etc in NetLogo. It interfaces with GoGo boards running HID-driver-compatible firmware, and it replaces the old GoGo Extension that used USB-serial communications. (The old GoGo extension is [here](https://github.com/NetLogo/GoGo-Serial-Extension).)  
+This is the new extension for physical computing, using sensors, motors, etc in NetLogo. It interfaces with GoGo boards running Human Interface Driver (HID) firmware, and it replaces the old GoGo Extension, which used USB-serial communications. (The USB-serial GoGo extension is still available  [here](https://github.com/NetLogo/GoGo-Serial-Extension).)  
 
 This extension comes bundled with NetLogo as of NetLogo 5.2.  The source code is hosted online at
 https://github.com/NetLogo/GoGo-HID-Extension.
@@ -31,11 +31,11 @@ https://github.com/NetLogo/GoGo-HID-Extension.
 
 ## Changes
 
-Compared to the previous extension, this new version offers:
+Compared to previous versions of the GoGo extension, this version offers:
 
-- **Improved robustness**: with prior versions of the GoGo extension, crashes were fairly common due to problems in the USB-Serial stack across platforms.
-- **No Installation of Drivers**: Because the new GoGo firmware presents the board as an HID device, the extension could be written so as not to require installing drivers.  This means there is no need for the user to have administrator rights on the computer.
-- **Directionality for Motors**: The board now has polarity-ensuring motor connectors, so that "counterclockwise" or "clockwise" can now be specified in code.
+- **Improved robustness**.  With prior versions of the GoGo extension, crashes were fairly common due to problems in the USB-Serial stack across platforms.  The switch to HID improved robustness, and the new extension also uses a "daemon" architecture which shields NetLogo from any problems that may occur in direct communication with the GoGo board.  The result is a dramatic reduction in the number of crashes of NetLogo.
+- **No Installation of Drivers**. Because the new GoGo firmware presents the board as an HID device, the extension could be written so as not to require installing drivers.  This means there is no need for the user to have administrator rights on the computer.
+- **Directionality for Motors**. The board now has polarity-ensuring output connectors, so that "counterclockwise" or "clockwise" can now be specified in code.
 
 
 ## Usage
@@ -46,17 +46,10 @@ The GoGo Extension comes preinstalled when you download and install NetLogo. To 
    
 If your model already uses other extensions, then it already has an extensions line in it, so just add gogo to the list.
 
-After loading the extension, see whether one or more gogos are on and attached to the computer by typing the following into the command center:
+After loading the extension, you can see whether one or more HID-based gogos are on and attached to the computer by typing the following into the command center:
 
 	gogo:howmany-gogos
 	
-### Example: Controlling a Car
-
-Imagine that we want to control a car with four wheels and two motors attached to the back wheels. We will assume that you have built such a car and connected the motors to the output ports "a" and "b" on the GoGo board. One very simple approach could be to create two buttons for each motor, "on" and "off":
-
-![carex][carex]
-
-{}{}{}More stuff here, from the Old Manual.
 
 ## Primitives
 
@@ -81,7 +74,7 @@ Reports the number of USB HID devices visible to the computer and having the cor
 
 `gogo:talk-to-output-ports _list-of-portnames_`
 
-Establishes the context of 
+Establishes a list of output ports that will be controlled with subsequent "output-port" commands.  See below...
 
 
 #### set-output-port-power
@@ -106,15 +99,21 @@ Turns off the output ports which have been indicated with talk-to-output-ports. 
 
 `gogo:output-port-clockwise`
 
+Sets the polarity of the output port(s) that have been specified with talk-to-output-ports, so that a motor attached to one of these ports would turn clockwise.
+
 
 #### output-port-counterclockwise
 
 `gogo:output-port-counterclockwise`
 
+Sets the polarity of the output port(s) that have been specified with talk-to-output-ports, so that a motor attached to one of these ports would turn counterclockwise.
+
 
 #### set-servo
 
 `gogo:set-servo`
+
+Sets the Pulse-Width Modulation (PWM) proportion of the output port(s) that have been specified with talk-to-output-ports.  Note that the servo connectors are the male pins next to the standard motor connectors.  Different servos respond to different PWM ranges, but all servos read PWM proportions and set the position of their main gear accordingly.
 
 
 
@@ -123,10 +122,13 @@ Turns off the output ports which have been indicated with talk-to-output-ports. 
 #### led
 `gogo:led _on-or-off_`
 
+Turns the user-LED on or off, depending on the argument.  gogo:led 1 turns the LED on; gogo:led 0 turns it off.
+
 
 #### beep
 `gogo:beep`
 
+Causes the GoGo board to beep.
 
 
 ### Sensors
@@ -134,7 +136,7 @@ Turns off the output ports which have been indicated with talk-to-output-ports. 
 #### read-sensors
 `gogo:read-sensors`
 
-Reports a list containing the current readings of all eight sensors.
+Reports a list containing the current readings of all eight sensors ports of the GoGo.
 
 #### read-sensor
 `gogo:read-sensor _which-sensor_`
@@ -149,13 +151,13 @@ Reports the value of sensor number _which sensor_, where _which sensor_ is a num
 #### read-all
 `gogo:read-all`
 
-Reports all data available from the board, in raw-list form.
+Reports all data available from the board, in a raw-list form useful for debugging.
 
 
 #### send-bytes
 `gogo:send-bytes _list-of-bytes_`
 
-check argument
+Sends a list of bytes to the GoGo board.  Useful for debugging or for testing any new or future functionality that is added to the GoGo board with new firmware updates.
 
 
 
