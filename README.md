@@ -12,7 +12,7 @@ https://github.com/NetLogo/GoGo-HID-Extension.
 
 - [primitives](#primitives), [howmany-gogos](#howmany-gogos)
 
-[5v Outputs and Servos](#5v)
+[Outputs and Servos](#outputs-and-servos)
 
 - [talk-to-output-ports](#talk-to-output-ports), [set-output-port-power](#set-output-port-power), [output-port-on](#output-port-on), [output-port-off](#output-port-off), [output-port-clockwise](#output-port-clockwise), [output-port-counterclockwise](#output-port-counterclockwise), [set-servo](#set-servo)
 
@@ -74,7 +74,7 @@ Returns a list of the primitives of this extension.
 
 Reports the number of USB HID devices visible to the computer and having the correct vendor and product ID to be a GoGo board.  A board will only be detected if it is both connected and powered on.  Using this primitive is one way to determine quickly whether a GoGo board has the HID firmware loaded. (A USB-Serial version of the board will not be detected.).
 
-### 5v Outputs and Servos
+### Outputs and Servos
 
 
 #### talk-to-output-ports 
