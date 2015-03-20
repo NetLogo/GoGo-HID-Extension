@@ -21,7 +21,7 @@ RESOURCES=resources
 
 all: gogo-daemon.jar gogo.jar
 
-gogo.jar: $(COMMON_SRCS) $(EXT_SRCS) manifest.txt Makefile
+gogo.jar: $(COMMON_SRCS) $(EXT_SRCS) gogo-daemon.jar manifest.txt Makefile
 	rm -rf classes
 	mkdir -p classes
 	$(JAVAC) -g -deprecation -Xlint:all -Xlint:-serial -Xlint:-path -encoding us-ascii -source 1.5 -target 1.5 -classpath $(NETLOGO)/NetLogoLite.jar:$(NETLOGO)/NetLogo.jar -d classes $(COMMON_SRCS) $(EXT_SRCS)

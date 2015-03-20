@@ -39,6 +39,7 @@ public class HIDGogoExtension extends DefaultClassManager {
         org.nlogo.swing.BrowserLauncher.openURL
           (org.nlogo.app.App.app().frame(), "https://github.com/NetLogo/NetLogo/wiki/GoGo-Upgrade", false);
       }
+      System.getProperties().put("org.nlogo.gogo.shownErrorMessage", "");
       shownErrorMessage = true;
     }
   }
@@ -76,6 +77,8 @@ public class HIDGogoExtension extends DefaultClassManager {
 
   @Override
   public void load(PrimitiveManager pm) throws ExtensionException {
+
+    shownErrorMessage = System.getProperties().containsKey("org.nlogo.gogo.shownErrorMessage");
     
     pm.addPrimitive("primitives", new Prims() );
 
