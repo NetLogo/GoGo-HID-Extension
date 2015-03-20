@@ -12,7 +12,7 @@ https://github.com/NetLogo/GoGo-HID-Extension.
 
 - [primitives](#primitives), [howmany-gogos](#howmany-gogos)
 
-[5v Outputs and Servos](#motors-and-servos)
+[5v Outputs and Servos](#5v Outputs and Servos)
 
 - [talk-to-output-ports](#talk-to-output-ports), [set-output-port-power](#set-output-port-power), [output-port-on](#output-port-on), [output-port-off](#output-port-off), [output-port-clockwise](#output-port-clockwise), [output-port-counterclockwise](#output-port-counterclockwise), [set-servo](#set-servo)
 
