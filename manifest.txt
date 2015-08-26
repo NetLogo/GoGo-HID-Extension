@@ -1,4 +1,0 @@
-Manifest-Version: 1.0
-Extension-Name: gogohid
-Class-Manager: gogoHID.extension.HIDGogoExtension
-NetLogo-Extension-API-Version: 5.0
