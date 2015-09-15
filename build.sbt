@@ -10,18 +10,14 @@ val baseSettings = Seq(
   unmanagedSourceDirectories in Compile += baseDirectory.value / "src" / "common"
 )
 
-lazy val packedJar = taskKey[File]("packed jar")
-
 lazy val root =
   project.in(file(".")).
     aggregate(extension, daemon).
     settings(
       packageBin in Compile := {
-        val extensionPacked = (packedJar in Compile in extension).value
         val extensionJar    = (packageBin in Compile in extension).value
         val daemonJar       = (packageBin in Compile in daemon).value
         val copyFiles       = Seq(
-          extensionPacked -> baseDirectory.value / extensionPacked.getName,
           extensionJar    -> baseDirectory.value / extensionJar.getName,
           daemonJar       -> baseDirectory.value / daemonJar.getName)
         IO.copy(sources = copyFiles)
@@ -35,30 +31,17 @@ lazy val extension = project.
   enablePlugins(org.nlogo.build.NetLogoExtension).
   settings(baseSettings).
   settings(
-    javaSource in Compile := baseDirectory.value / "extension" / "gogoHID",
+    javaSource in Compile := baseDirectory.value.getParentFile / "src" / "extension" / "gogoHID",
     name := "gogo",
     netLogoExtName := "gogohid",
     netLogoClassManager := "gogoHID.extension.HIDGogoExtension",
-    netLogoZipSources := false,
-    packedJar in Compile := {
-      val jar = (packageBin in Compile).value
-      val packFile = jar.getParentFile / "gogo.jar.pack.gz"
-      val options = Seq(
-        "modification-time"  -> "latest",
-        "effort"             -> "9",
-        "strip-debug"        -> "",
-        "no-keep-file-order" -> "",
-        "unknown-attribute"  -> "strip")
-      Pack.pack(jar, packFile, options)
-      packFile
-    }
-  )
+    netLogoZipSources := false)
 
 lazy val daemon = project.
   settings(baseSettings).
   settings(
     name := "gogo-daemon",
-    javaSource in Compile := baseDirectory.value / "daemon" / "gogoHID",
+    javaSource in Compile := baseDirectory.value.getParentFile / "src" / "daemon" / "gogoHID",
     artifactName := { (_, _, _) => "gogo-daemon.jar" }
   )
 
