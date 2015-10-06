@@ -1,14 +1,22 @@
-val baseSettings = Seq(
-  scalaVersion := "2.11.6",
+val netLogoJarURL =
+  Option(System.getProperty("netlogo.jar.url")).getOrElse("http://ccl.northwestern.edu/netlogo/5.3.0/NetLogo.jar")
+
+val netLogoJarOrDependency = {
+  import java.io.File
+  import java.net.URI
+  if (netLogoJarURL.startsWith("file:"))
+    Seq(unmanagedJars in Compile += new File(new URI(netLogoJarURL)))
+  else
+    Seq(libraryDependencies += "org.nlogo" % "NetLogo" % "5.3.0" from netLogoJarURL)
+}
+
+val baseSettings =  netLogoJarOrDependency ++ Seq(
+  scalaVersion := "2.11.7",
   resourceDirectory in Compile := { baseDirectory.value / "resources" },
   scalacOptions ++= Seq("-deprecation", "-unchecked", "-Xlint", "-Xfatal-warnings",
                       "-encoding", "us-ascii"),
   javacOptions ++= Seq("-g", "-deprecation", "-Xlint:all", "-Xlint:-serial", "-Xlint:-path",
-                      "-encoding", "us-ascii"),
-  libraryDependencies += "org.nlogo" % "NetLogo" % "5.3.0" from
-      Option(System.getProperty("netlogo.jar.url")).getOrElse("http://ccl.northwestern.edu/netlogo/5.3.0/NetLogo.jar"),
-  unmanagedSourceDirectories in Compile += baseDirectory.value / "src" / "common"
-)
+                      "-encoding", "us-ascii"))
 
 lazy val root =
   project.in(file(".")).
@@ -33,7 +41,6 @@ lazy val extension = project.
   settings(
     javaSource in Compile := baseDirectory.value.getParentFile / "src" / "extension" / "gogoHID",
     name := "gogo",
-    netLogoExtName := "gogohid",
     netLogoClassManager := "gogoHID.extension.HIDGogoExtension",
     netLogoZipSources := false)
 
