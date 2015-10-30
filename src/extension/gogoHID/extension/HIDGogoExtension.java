@@ -10,11 +10,12 @@ import org.nlogo.api.DefaultCommand;
 import org.nlogo.api.DefaultReporter;
 import org.nlogo.api.ExtensionException;
 import org.nlogo.api.LogoException;
-import org.nlogo.api.LogoList;
+import org.nlogo.core.LogoList;
 import org.nlogo.api.LogoListBuilder;
 import org.nlogo.api.PrimitiveManager;
 import org.nlogo.api.ExtensionManager;
-import org.nlogo.api.Syntax;
+import org.nlogo.core.Syntax;
+import org.nlogo.core.SyntaxJ;
 
 import java.io.*;
 
@@ -103,22 +104,22 @@ public class HIDGogoExtension extends DefaultClassManager {
     pm.addPrimitive("howmany-gogos", new Enumerate() );
 
     // Old Primitives that should let you know we've changed the extension
-    pm.addPrimitive("ports", new OldReporter("ports", Syntax.reporterSyntax(Syntax.ListType())));
-    pm.addPrimitive("burst-value", new OldReporter("burst-value", Syntax.reporterSyntax(new int[] {Syntax.NumberType()}, Syntax.NumberType())));
-    pm.addPrimitive("close", new OldCommand("close", Syntax.commandSyntax()));
-    pm.addPrimitive("install", new OldCommand("install", Syntax.commandSyntax()));
-    pm.addPrimitive("led-off", new OldCommand("led-off", Syntax.commandSyntax()));
-    pm.addPrimitive("led-on", new OldCommand("led-on", Syntax.commandSyntax()));
-    pm.addPrimitive("open", new OldCommand("open", Syntax.commandSyntax(new int[] {Syntax.StringType()})));
-    pm.addPrimitive("open?", new OldReporter("open?", Syntax.reporterSyntax(Syntax.BooleanType())));
-    pm.addPrimitive("output-port-coast", new OldCommand("output-port-coast", Syntax.commandSyntax()));
-    pm.addPrimitive("output-port-reverse", new OldCommand("output-port-reverse", Syntax.commandSyntax()));
-    pm.addPrimitive("output-port-thatway", new OldCommand("output-port-thatway", Syntax.commandSyntax()));
-    pm.addPrimitive("output-port-thisway", new OldCommand("output-port-thisway", Syntax.commandSyntax()));
-    pm.addPrimitive("ping", new OldReporter("ping", Syntax.reporterSyntax(Syntax.BooleanType())));
-    pm.addPrimitive("sensor", new OldReporter("sensor", Syntax.reporterSyntax(new int[] {Syntax.NumberType()}, Syntax.NumberType())));
-    pm.addPrimitive("set-burst-mode", new OldCommand("set-burst-mode", Syntax.commandSyntax(new int[] {Syntax.ListType(), Syntax.BooleanType()})));
-    pm.addPrimitive("stop-burst-mode", new OldCommand("stop-burst-mode", Syntax.commandSyntax()));
+    pm.addPrimitive("ports", new OldReporter("ports", SyntaxJ.reporterSyntax(Syntax.ListType())));
+    pm.addPrimitive("burst-value", new OldReporter("burst-value", SyntaxJ.reporterSyntax(new int[] {Syntax.NumberType()}, Syntax.NumberType())));
+    pm.addPrimitive("close", new OldCommand("close", SyntaxJ.commandSyntax()));
+    pm.addPrimitive("install", new OldCommand("install", SyntaxJ.commandSyntax()));
+    pm.addPrimitive("led-off", new OldCommand("led-off", SyntaxJ.commandSyntax()));
+    pm.addPrimitive("led-on", new OldCommand("led-on", SyntaxJ.commandSyntax()));
+    pm.addPrimitive("open", new OldCommand("open", SyntaxJ.commandSyntax(new int[] {Syntax.StringType()})));
+    pm.addPrimitive("open?", new OldReporter("open?", SyntaxJ.reporterSyntax(Syntax.BooleanType())));
+    pm.addPrimitive("output-port-coast", new OldCommand("output-port-coast", SyntaxJ.commandSyntax()));
+    pm.addPrimitive("output-port-reverse", new OldCommand("output-port-reverse", SyntaxJ.commandSyntax()));
+    pm.addPrimitive("output-port-thatway", new OldCommand("output-port-thatway", SyntaxJ.commandSyntax()));
+    pm.addPrimitive("output-port-thisway", new OldCommand("output-port-thisway", SyntaxJ.commandSyntax()));
+    pm.addPrimitive("ping", new OldReporter("ping", SyntaxJ.reporterSyntax(Syntax.BooleanType())));
+    pm.addPrimitive("sensor", new OldReporter("sensor", SyntaxJ.reporterSyntax(new int[] {Syntax.NumberType()}, Syntax.NumberType())));
+    pm.addPrimitive("set-burst-mode", new OldCommand("set-burst-mode", SyntaxJ.commandSyntax(new int[] {Syntax.ListType(), Syntax.BooleanType()})));
+    pm.addPrimitive("stop-burst-mode", new OldCommand("stop-burst-mode", SyntaxJ.commandSyntax()));
   
     try { 
       bootHIDDaemon();
@@ -233,7 +234,7 @@ public class HIDGogoExtension extends DefaultClassManager {
   private class Prims extends DefaultReporter {
     @Override
     public Syntax getSyntax() {
-        return Syntax.reporterSyntax(Syntax.ListType());
+        return SyntaxJ.reporterSyntax(Syntax.ListType());
       }
     
     @Override
@@ -265,7 +266,7 @@ public class HIDGogoExtension extends DefaultClassManager {
   private class ReadSensors extends DefaultReporter {
     @Override
     public Syntax getSyntax() {
-      return Syntax.reporterSyntax(Syntax.ListType());
+      return SyntaxJ.reporterSyntax(Syntax.ListType());
     }
     
     @Override
@@ -293,7 +294,7 @@ public class HIDGogoExtension extends DefaultClassManager {
   private class ReadSensorNumber extends DefaultReporter {
     @Override
     public Syntax getSyntax() {
-      return Syntax.reporterSyntax(new int[] {Syntax.NumberType() }, Syntax.NumberType());
+      return SyntaxJ.reporterSyntax(new int[] {Syntax.NumberType() }, Syntax.NumberType());
     }
     
     @Override
@@ -334,7 +335,7 @@ public class HIDGogoExtension extends DefaultClassManager {
   private class LED extends DefaultCommand {
     @Override
     public Syntax getSyntax() {
-      return Syntax.commandSyntax(new int[] {Syntax.NumberType() });
+      return SyntaxJ.commandSyntax(new int[] {Syntax.NumberType() });
     }
     
     @Override
@@ -359,13 +360,13 @@ public class HIDGogoExtension extends DefaultClassManager {
   private class TalkToOutputPort extends DefaultCommand {
     @Override
     public Syntax getSyntax() {
-      return Syntax.commandSyntax(new int[] {Syntax.ListType() });
+      return SyntaxJ.commandSyntax(new int[] {Syntax.ListType() });
     }
     
     @Override
     public void perform(Argument args[], Context context)
         throws ExtensionException, org.nlogo.api.LogoException {
-      java.util.Iterator<?> iter = args[0].getList().iterator();
+      java.util.Iterator<?> iter = args[0].getList().javaIterator();
 
       int outputPortMask = 0;
       while (iter.hasNext()) {
@@ -403,7 +404,7 @@ public class HIDGogoExtension extends DefaultClassManager {
   private class SetOutputPortPower extends DefaultCommand {
     @Override
     public Syntax getSyntax() {
-      return Syntax.commandSyntax(new int[] {Syntax.NumberType() });
+      return SyntaxJ.commandSyntax(new int[] {Syntax.NumberType() });
     }
     
     @Override
@@ -480,7 +481,7 @@ public class HIDGogoExtension extends DefaultClassManager {
   private class SetServo extends DefaultCommand {
     @Override
     public Syntax getSyntax() {
-      return Syntax.commandSyntax(new int[] {Syntax.NumberType() });
+      return SyntaxJ.commandSyntax(new int[] {Syntax.NumberType() });
     }
     
     @Override
@@ -500,7 +501,7 @@ public class HIDGogoExtension extends DefaultClassManager {
   private class SendBytes extends DefaultCommand {
     @Override
     public Syntax getSyntax() {
-      return Syntax.commandSyntax(new int[] { Syntax.ListType() });
+      return SyntaxJ.commandSyntax(new int[] { Syntax.ListType() });
     }
     
     @Override
@@ -521,7 +522,7 @@ public class HIDGogoExtension extends DefaultClassManager {
   private class ReadAll extends DefaultReporter {
     @Override
     public Syntax getSyntax() {
-        return Syntax.reporterSyntax(Syntax.ListType());
+        return SyntaxJ.reporterSyntax(Syntax.ListType());
       }
     
     @Override
