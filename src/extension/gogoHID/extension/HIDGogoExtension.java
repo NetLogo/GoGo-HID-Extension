@@ -6,8 +6,8 @@ import java.nio.ByteOrder;
 import org.nlogo.api.Argument;
 import org.nlogo.api.Context;
 import org.nlogo.api.DefaultClassManager;
-import org.nlogo.api.DefaultCommand;
-import org.nlogo.api.DefaultReporter;
+import org.nlogo.api.Command;
+import org.nlogo.api.Reporter;
 import org.nlogo.api.ExtensionException;
 import org.nlogo.api.LogoException;
 import org.nlogo.core.LogoList;
@@ -45,7 +45,7 @@ public class HIDGogoExtension extends DefaultClassManager {
     }
   }
 
-  private class OldReporter extends DefaultReporter {
+  private class OldReporter implements Reporter {
     private Syntax syntax;
     private String primitiveName;
 
@@ -61,7 +61,7 @@ public class HIDGogoExtension extends DefaultClassManager {
     }
   }
 
-  private class OldCommand extends DefaultCommand {
+  private class OldCommand implements Command {
     private Syntax syntax;
     private String primitiveName;
 
@@ -231,7 +231,7 @@ public class HIDGogoExtension extends DefaultClassManager {
     }
   }
   
-  private class Prims extends DefaultReporter {
+  private class Prims implements Reporter {
     @Override
     public Syntax getSyntax() {
         return SyntaxJ.reporterSyntax(Syntax.ListType());
@@ -263,7 +263,7 @@ public class HIDGogoExtension extends DefaultClassManager {
     }
   }
   
-  private class ReadSensors extends DefaultReporter {
+  private class ReadSensors implements Reporter {
     @Override
     public Syntax getSyntax() {
       return SyntaxJ.reporterSyntax(Syntax.ListType());
@@ -291,7 +291,7 @@ public class HIDGogoExtension extends DefaultClassManager {
     }
   }
   
-  private class ReadSensorNumber extends DefaultReporter {
+  private class ReadSensorNumber implements Reporter {
     @Override
     public Syntax getSyntax() {
       return SyntaxJ.reporterSyntax(new int[] {Syntax.NumberType() }, Syntax.NumberType());
@@ -319,7 +319,12 @@ public class HIDGogoExtension extends DefaultClassManager {
     }
   }
   
-  private class Beep extends DefaultCommand {
+  private class Beep implements Command {
+    @Override
+    public Syntax getSyntax() {
+      return SyntaxJ.commandSyntax();
+    }
+
     @Override
     public void perform(Argument[] arg0, Context arg1)
         throws ExtensionException, LogoException {
@@ -332,7 +337,7 @@ public class HIDGogoExtension extends DefaultClassManager {
     }
   }
   
-  private class LED extends DefaultCommand {
+  private class LED implements Command {
     @Override
     public Syntax getSyntax() {
       return SyntaxJ.commandSyntax(new int[] {Syntax.NumberType() });
@@ -357,7 +362,7 @@ public class HIDGogoExtension extends DefaultClassManager {
   }
   
   
-  private class TalkToOutputPort extends DefaultCommand {
+  private class TalkToOutputPort implements Command {
     @Override
     public Syntax getSyntax() {
       return SyntaxJ.commandSyntax(new int[] {Syntax.ListType() });
@@ -401,7 +406,7 @@ public class HIDGogoExtension extends DefaultClassManager {
   }
   
   
-  private class SetOutputPortPower extends DefaultCommand {
+  private class SetOutputPortPower implements Command {
     @Override
     public Syntax getSyntax() {
       return SyntaxJ.commandSyntax(new int[] {Syntax.NumberType() });
@@ -422,7 +427,12 @@ public class HIDGogoExtension extends DefaultClassManager {
   }
   
   
-  private class OutputPortOn extends DefaultCommand {
+  private class OutputPortOn implements Command {
+    @Override
+    public Syntax getSyntax() {
+      return SyntaxJ.commandSyntax();
+    }
+
     @Override
     public void perform(Argument[] args, Context ctx)
         throws ExtensionException, LogoException {
@@ -436,7 +446,12 @@ public class HIDGogoExtension extends DefaultClassManager {
   }
   
   
-  private class OutputPortOff extends DefaultCommand {
+  private class OutputPortOff implements Command {
+    @Override
+    public Syntax getSyntax() {
+      return SyntaxJ.commandSyntax();
+    }
+
     @Override
     public void perform(Argument[] args, Context ctx)
         throws ExtensionException, LogoException {
@@ -451,7 +466,12 @@ public class HIDGogoExtension extends DefaultClassManager {
   }
   
 
-  private class OutputPortClockwise extends DefaultCommand {
+  private class OutputPortClockwise implements Command {
+    @Override
+    public Syntax getSyntax() {
+      return SyntaxJ.commandSyntax();
+    }
+
     @Override
     public void perform(Argument[] arg0, Context arg1)
         throws ExtensionException, LogoException {
@@ -465,7 +485,12 @@ public class HIDGogoExtension extends DefaultClassManager {
     }
   }
   
-  private class OutputPortCounterClockwise extends DefaultCommand {
+  private class OutputPortCounterClockwise implements Command {
+    @Override
+    public Syntax getSyntax() {
+      return SyntaxJ.commandSyntax();
+    }
+
     @Override
     public void perform(Argument[] arg0, Context arg1)
         throws ExtensionException, LogoException {
@@ -478,7 +503,7 @@ public class HIDGogoExtension extends DefaultClassManager {
     }
   }
   
-  private class SetServo extends DefaultCommand {
+  private class SetServo implements Command {
     @Override
     public Syntax getSyntax() {
       return SyntaxJ.commandSyntax(new int[] {Syntax.NumberType() });
@@ -498,12 +523,12 @@ public class HIDGogoExtension extends DefaultClassManager {
     }
   }
   
-  private class SendBytes extends DefaultCommand {
+  private class SendBytes implements Command {
     @Override
     public Syntax getSyntax() {
       return SyntaxJ.commandSyntax(new int[] { Syntax.ListType() });
     }
-    
+
     @Override
     public void perform(Argument[] args, Context ctx)
         throws ExtensionException, LogoException {
@@ -519,12 +544,12 @@ public class HIDGogoExtension extends DefaultClassManager {
   }
   
   
-  private class ReadAll extends DefaultReporter {
+  private class ReadAll implements Reporter {
     @Override
     public Syntax getSyntax() {
         return SyntaxJ.reporterSyntax(Syntax.ListType());
       }
-    
+
     @Override
     public Object report(Argument[] arg0, Context arg1)
         throws ExtensionException, LogoException {
@@ -543,7 +568,12 @@ public class HIDGogoExtension extends DefaultClassManager {
   
 
   
-  private class Enumerate extends DefaultReporter {
+  private class Enumerate implements Reporter {
+    @Override
+    public Syntax getSyntax() {
+      return SyntaxJ.reporterSyntax(Syntax.NumberType());
+    }
+
     @Override
     public Object report(Argument[] arg0, Context arg1)
         throws ExtensionException, LogoException {
