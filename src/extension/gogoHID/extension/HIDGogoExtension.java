@@ -174,7 +174,10 @@ public class HIDGogoExtension extends DefaultClassManager {
 
   private void bootHIDDaemon() throws ExtensionException{
     System.out.println("looking for system java, override by setting property " + javaLocationPropertyKey);
-    String executable = System.getProperty(javaLocationPropertyKey, javaExecutablePath());
+    String executable = System.getProperty(javaLocationPropertyKey);
+    if (executable == null) {
+      executable = javaExecutablePath();
+    }
     String gogoExtensionPath =
       System.getProperty("netlogo.extensions.dir", "extensions") + File.separator + "gogo" + File.separator;
     try {
