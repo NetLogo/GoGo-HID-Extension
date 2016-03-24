@@ -17,10 +17,18 @@ import org.nlogo.api.ExtensionManager;
 import org.nlogo.core.Syntax;
 import org.nlogo.core.SyntaxJ;
 
+import org.nlogo.awt.UserCancelException;
+
+import org.nlogo.swing.FileDialog;
+
+import java.util.List;
+import java.util.Arrays;
 import java.io.*;
 
 public class HIDGogoExtension extends DefaultClassManager {
-  
+
+  static final String javaLocationPropertyKey = "netlogo.extensions.gogo.javaexecutable";
+
   private boolean shownErrorMessage = false;
 
   private class UnsuccessfulReadOperation extends Exception {};
@@ -140,14 +148,48 @@ public class HIDGogoExtension extends DefaultClassManager {
   private InputStream err = null;
   private Process proc = null;
   private boolean stillRunning = false;
-  
+
+  private String userJavaPath(String defaultJava) {
+    if (org.nlogo.app.App$.MODULE$ != null && org.nlogo.app.App$.MODULE$.app() != null) {
+      try {
+        return FileDialog.show(org.nlogo.app.App$.MODULE$.app().frame(),
+            "Please locate your java executable", java.awt.FileDialog.LOAD);
+      } catch (UserCancelException e) {
+        System.out.println("User canceled java location, using default java");
+      }
+    } else {
+      System.out.println("NetLogo is headless, using default java");
+    }
+    return defaultJava;
+  }
+
+  private String javaExecutablePath() {
+    if (System.getProperty("os.name").indexOf("Mac") != -1) {
+      return userJavaPath("/usr/bin/java");
+    } else if (System.getProperty("os.name").indexOf("Windows") != -1) {
+      return userJavaPath("java.exe");
+    } else {
+      return userJavaPath("java");
+    }
+  }
+
   private void bootHIDDaemon() throws ExtensionException{
-    String executable = System.getProperty("java.home") + java.io.File.separator + "bin" + java.io.File.separator + "java";
-    System.out.println(executable);
+    System.out.println("looking for system java, override by setting property " + javaLocationPropertyKey);
+    String executable = System.getProperty(javaLocationPropertyKey);
+    if (executable == null) {
+      executable = javaExecutablePath();
+    }
+    String gogoExtensionPath =
+      System.getProperty("netlogo.extensions.dir", "extensions") + File.separator + "gogo" + File.separator;
     try {
-      proc = Runtime.getRuntime().exec(new String[] {executable, "-cp",
-          "extensions/gogo/gogo-daemon.jar:extensions/gogo/hid4java.jar:extensions/gogo/jna.jar",
-          "gogoHID.daemon.HIDGogoDaemon"});
+      String classpath =
+        new File(gogoExtensionPath + "gogo-daemon.jar").getCanonicalPath() + File.pathSeparator +
+        new File(gogoExtensionPath + "hid4java.jar").getCanonicalPath() + File.pathSeparator +
+        new File(gogoExtensionPath + "jna.jar").getCanonicalPath();
+      List<String> command = Arrays.asList(executable, "-classpath", classpath, "-showversion", "gogoHID.daemon.HIDGogoDaemon");
+      System.out.println("running: " + Arrays.toString(command.toArray()));
+      proc = new ProcessBuilder(command).start();
+      System.setProperty(javaLocationPropertyKey, executable);
       stillRunning = true;
       os = proc.getOutputStream();
       is = proc.getInputStream();
@@ -178,6 +220,10 @@ public class HIDGogoExtension extends DefaultClassManager {
         }
       }.start();
     } catch(Exception e) {
+      System.out.println("ERROR BOOTING DAEMON:");
+      System.out.println(e.getClass());
+      System.out.println(e.getMessage());
+      e.printStackTrace();
       throw new ExtensionException("Couldn't boot daemon");
     }
   }
@@ -205,11 +251,6 @@ public class HIDGogoExtension extends DefaultClassManager {
       os.write(numBytes);
       os.flush();
 
-      int success = is.read();
-      if(success != 0) {
-        throw new UnsuccessfulReadOperation();
-      }
-
       byte[] data = new byte[numBytes];
       is.read(data);
       return data;
@@ -230,13 +271,13 @@ public class HIDGogoExtension extends DefaultClassManager {
       throw new ExtensionException("Couldn't write message to daemon");
     }
   }
-  
+
   private class Prims implements Reporter {
     @Override
     public Syntax getSyntax() {
         return SyntaxJ.reporterSyntax(Syntax.ListType());
       }
-    
+
     @Override
     public Object report(Argument[] arg0, Context arg1)
         throws ExtensionException, LogoException {
@@ -307,18 +348,18 @@ public class HIDGogoExtension extends DefaultClassManager {
       Short sensorReading = 0;
       try {
         byte[] data = receiveMessage(64);
-        
+
         ByteBuffer bb = ByteBuffer.wrap(data,(2*(sensorNumber-1)) + 1,2 );
         bb.order(ByteOrder.BIG_ENDIAN);
         sensorReading = bb.getShort();
       } catch(UnsuccessfulReadOperation e) {
         System.err.println("Couldn't read from gogo board");
       }
-      
+
       return sensorReading.doubleValue();
     }
   }
-  
+
   private class Beep implements Command {
     @Override
     public Syntax getSyntax() {
@@ -330,44 +371,43 @@ public class HIDGogoExtension extends DefaultClassManager {
         throws ExtensionException, LogoException {
       byte[] message = new byte[64];
       message[0] = (byte)0;
-      message[1] = (byte)11;  
+      message[1] = (byte)11;
       message[2] = (byte)0;
-      message[3] = (byte)0;  
+      message[3] = (byte)0;
       sendMessage(message);
     }
   }
-  
+
   private class LED implements Command {
     @Override
     public Syntax getSyntax() {
       return SyntaxJ.commandSyntax(new int[] {Syntax.NumberType() });
     }
-    
+
     @Override
     public void perform(Argument[] args, Context arg1)
         throws ExtensionException, LogoException {
       byte[] message = new byte[64];
       boolean turnOn = ( args[0].getIntValue() == 1);
       message[0] = (byte)0;
-      message[1] = (byte)10; 
+      message[1] = (byte)10;
       message[2] = (byte)0;
       if (turnOn) {
         message[3] = (byte)1;
       } else {
-        message[3] = (byte)0;  
+        message[3] = (byte)0;
       }
-      
+
       sendMessage(message);
     }
   }
-  
-  
+
   private class TalkToOutputPort implements Command {
     @Override
     public Syntax getSyntax() {
       return SyntaxJ.commandSyntax(new int[] {Syntax.ListType() });
     }
-    
+
     @Override
     public void perform(Argument args[], Context context)
         throws ExtensionException, org.nlogo.api.LogoException {
@@ -395,23 +435,22 @@ public class HIDGogoExtension extends DefaultClassManager {
             break;
         }
       }
-      
+
       byte[] message = new byte[64];
       message[0] = (byte)0;
-      message[1] = (byte)7;  
+      message[1] = (byte)7;
       message[2] = (byte)outputPortMask;
-      message[3] = (byte)0;   
+      message[3] = (byte)0;
       sendMessage(message);
     }
   }
-  
-  
+
   private class SetOutputPortPower implements Command {
     @Override
     public Syntax getSyntax() {
       return SyntaxJ.commandSyntax(new int[] {Syntax.NumberType() });
     }
-    
+
     @Override
     public void perform(Argument[] args, Context ctx)
         throws ExtensionException, LogoException {
@@ -420,13 +459,12 @@ public class HIDGogoExtension extends DefaultClassManager {
       message[0] = (byte)0;
       message[1] = (byte)6;
       message[2] = (byte)0;
-      message[3] = (byte)0; //high byte   
-      message[4] = (byte)outputPortPowerVal; 
+      message[3] = (byte)0; //high byte
+      message[4] = (byte)outputPortPowerVal;
       sendMessage(message);
     }
   }
-  
-  
+
   private class OutputPortOn implements Command {
     @Override
     public Syntax getSyntax() {
@@ -440,12 +478,11 @@ public class HIDGogoExtension extends DefaultClassManager {
       message[0] = (byte)0;
       message[1] = (byte)2;
       message[2] = (byte)0;
-      message[3] = (byte)1; //on  
+      message[3] = (byte)1; //on
       sendMessage(message);
     }
   }
-  
-  
+
   private class OutputPortOff implements Command {
     @Override
     public Syntax getSyntax() {
@@ -508,21 +545,21 @@ public class HIDGogoExtension extends DefaultClassManager {
     public Syntax getSyntax() {
       return SyntaxJ.commandSyntax(new int[] {Syntax.NumberType() });
     }
-    
+
     @Override
     public void perform(Argument[] args, Context ctx)
         throws ExtensionException, LogoException {
       int dutyLevel = args[0].getIntValue();
       byte[] message = new byte[64];
       message[0] = (byte)0;
-      message[1] = (byte)9;  
+      message[1] = (byte)9;
       message[2] = (byte)0;
-      message[3] = (byte)0; 
+      message[3] = (byte)0;
       message[4] = (byte)dutyLevel;
       sendMessage(message);
     }
   }
-  
+
   private class SendBytes implements Command {
     @Override
     public Syntax getSyntax() {
@@ -534,7 +571,7 @@ public class HIDGogoExtension extends DefaultClassManager {
         throws ExtensionException, LogoException {
       LogoList messageList = args[0].getList();
       byte[] message = new byte[64];
-      for (int i = 0; i<messageList.size(); i++) {
+      for (int i = 0; i<messageList.size() && i < 64; i++) {
         Object val = messageList.get(i);
         int v = (Integer)val;
         message[i] = (byte)v;
@@ -542,8 +579,7 @@ public class HIDGogoExtension extends DefaultClassManager {
       sendMessage(message);
     }
   }
-  
-  
+
   private class ReadAll implements Reporter {
     @Override
     public Syntax getSyntax() {
@@ -565,9 +601,7 @@ public class HIDGogoExtension extends DefaultClassManager {
       return llb.toLogoList();
     }
   }
-  
 
-  
   private class Enumerate implements Reporter {
     @Override
     public Syntax getSyntax() {
@@ -577,7 +611,7 @@ public class HIDGogoExtension extends DefaultClassManager {
     @Override
     public Object report(Argument[] arg0, Context arg1)
         throws ExtensionException, LogoException {
-      return numAttached();
+      return (double) numAttached();
     }
   }
 
@@ -589,7 +623,7 @@ public class HIDGogoExtension extends DefaultClassManager {
         int v = b & 0xFF;
         hexChars[0] = hexArray[v >>> 4];
         hexChars[1] = hexArray[v & 0x0F];
-    
+
       return new String(hexChars);
   }
 }
