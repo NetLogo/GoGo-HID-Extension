@@ -10,6 +10,7 @@ val baseSettings = Seq(
 lazy val root =
   project.in(file(".")).
     aggregate(extension, daemon).
+    enablePlugins(org.nlogo.build.ExtensionDocumentationPlugin).
     settings(
       packageBin in Compile := {
         val extensionJar    = (packageBin in Compile in extension).value
