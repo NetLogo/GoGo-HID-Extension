@@ -42,3 +42,5 @@ lazy val daemon = project.
     artifactName := { (_, _, _) => "gogo-daemon.jar" }
   )
 
+netLogoVersion := "6.0.0-BETA1"
+
