@@ -37,7 +37,7 @@ public class HIDGogoExtension extends DefaultClassManager {
     if(!shownErrorMessage) {
       while(true) {
         final int choice =
-            org.nlogo.swing.OptionDialog.show
+            org.nlogo.swing.OptionDialog.showMessage
                 (org.nlogo.app.App.app().frame(),
                     "GoGo Extension has been updated!",
                     "This model is using a primitive (gogo:" + primitiveName + ") from the old version of the GoGo extension.  Use gogo-serial for older GoGo boards.",
