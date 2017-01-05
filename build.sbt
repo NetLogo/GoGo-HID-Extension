@@ -1,6 +1,6 @@
 val baseSettings = Seq(
   scalaVersion := "2.12.0",
-  netLogoVersion := "6.0.0-BETA2",
+  netLogoVersion := "6.0.0",
   resourceDirectory in Compile := { baseDirectory.value / "resources" },
   scalacOptions ++= Seq("-deprecation", "-unchecked", "-Xlint", "-Xfatal-warnings",
                       "-encoding", "us-ascii"),
@@ -41,3 +41,4 @@ lazy val daemon = project.
     javaSource in Compile := baseDirectory.value.getParentFile / "src" / "daemon" / "gogoHID",
     artifactName := { (_, _, _) => "gogo-daemon.jar" }
   )
+
