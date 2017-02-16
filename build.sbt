@@ -1,6 +1,6 @@
 val baseSettings = Seq(
   scalaVersion := "2.12.0",
-  netLogoVersion := "6.0.0",
+  netLogoVersion := "6.0.1-M1",
   resourceDirectory in Compile := { baseDirectory.value / "resources" },
   scalacOptions ++= Seq("-deprecation", "-unchecked", "-Xlint", "-Xfatal-warnings",
                       "-encoding", "us-ascii"),
