@@ -152,7 +152,7 @@ public class HIDGogoExtension extends DefaultClassManager {
   private String userJavaPath(String defaultJava) {
     if (org.nlogo.app.App$.MODULE$ != null && org.nlogo.app.App$.MODULE$.app() != null) {
       try {
-        return FileDialog.show(org.nlogo.app.App$.MODULE$.app().frame(),
+        return FileDialog.showFiles(org.nlogo.app.App$.MODULE$.app().frame(),
             "Please locate your java executable", java.awt.FileDialog.LOAD);
       } catch (UserCancelException e) {
         System.out.println("User canceled java location, using default java");
