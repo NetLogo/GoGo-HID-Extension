@@ -140,14 +140,20 @@ public class HIDGogoExtension extends DefaultClassManager {
   }
 
   @Override public void unload(ExtensionManager pm) throws ExtensionException {
-    proc.destroy();
+    terminating = true;
+    if (proc != null)
+      proc.destroy();
+    if (monitorThread != null)
+      monitorThread.interrupt();
   }
 
   private OutputStream os = null;
   private InputStream is = null;
   private InputStream err = null;
   private Process proc = null;
-  private boolean stillRunning = false;
+  volatile private Thread monitorThread = null;
+  volatile private boolean stillRunning = false;
+  volatile private boolean terminating = false;
 
   private String userJavaPath(String defaultJava) {
     if (org.nlogo.app.App$.MODULE$ != null && org.nlogo.app.App$.MODULE$.app() != null) {
@@ -209,16 +215,22 @@ public class HIDGogoExtension extends DefaultClassManager {
           }
         }
       }.start();
-      new Thread() {
+      monitorThread = new Thread() {
         public void run() {
           try {
             proc.waitFor();
             stillRunning = false;
-          } catch (Exception e) {
+          }
+          catch (InterruptedException e) {
+            if (terminating)
+              proc.destroy();
+          }
+          catch (Exception e) {
             e.printStackTrace();
           }
         }
-      }.start();
+      };
+      monitorThread.start();
     } catch(Exception e) {
       System.out.println("ERROR BOOTING DAEMON:");
       System.out.println(e.getClass());
