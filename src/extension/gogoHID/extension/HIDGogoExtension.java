@@ -88,25 +88,25 @@ public class HIDGogoExtension extends DefaultClassManager {
   public void load(PrimitiveManager pm) throws ExtensionException {
 
     shownErrorMessage = System.getProperties().containsKey("org.nlogo.gogo.shownErrorMessage");
-    
+
     pm.addPrimitive("primitives", new Prims() );
 
     pm.addPrimitive("beep", new Beep() );
-    
+
     pm.addPrimitive("read-sensors", new ReadSensors() );
     pm.addPrimitive("read-sensor", new ReadSensorNumber() );
-    
+
     pm.addPrimitive("led", new LED() );
-    
+
     pm.addPrimitive("talk-to-output-ports",new TalkToOutputPort() );
     pm.addPrimitive("set-output-port-power", new SetOutputPortPower() );
     pm.addPrimitive("output-port-on", new OutputPortOn() );
     pm.addPrimitive("output-port-off", new OutputPortOff() );
     pm.addPrimitive("output-port-clockwise", new OutputPortClockwise() );
     pm.addPrimitive("output-port-counterclockwise", new OutputPortCounterClockwise() );
-    
+
     pm.addPrimitive("set-servo", new SetServo() );
-    
+
     pm.addPrimitive("read-all", new ReadAll() );
     pm.addPrimitive("send-bytes", new SendBytes() );
     pm.addPrimitive("howmany-gogos", new Enumerate() );
@@ -128,15 +128,15 @@ public class HIDGogoExtension extends DefaultClassManager {
     pm.addPrimitive("sensor", new OldReporter("sensor", SyntaxJ.reporterSyntax(new int[] {Syntax.NumberType()}, Syntax.NumberType())));
     pm.addPrimitive("set-burst-mode", new OldCommand("set-burst-mode", SyntaxJ.commandSyntax(new int[] {Syntax.ListType(), Syntax.BooleanType()})));
     pm.addPrimitive("stop-burst-mode", new OldCommand("stop-burst-mode", SyntaxJ.commandSyntax()));
-  
-    try { 
+
+    try {
       bootHIDDaemon();
     } catch (Exception e) {
       System.err.println("FAILED TO BOOT DAEMON");
       e.printStackTrace();
       throw new ExtensionException("Error in loading HID services");
     }
-      
+
   }
 
   @Override public void unload(ExtensionManager pm) throws ExtensionException {
@@ -164,9 +164,11 @@ public class HIDGogoExtension extends DefaultClassManager {
   }
 
   private String javaExecutablePath() {
-    if (System.getProperty("os.name").indexOf("Mac") != -1) {
+    String osName = System.getProperty("os.name").toLowerCase();
+    System.err.println(osName);
+    if (osName.contains("mac")) {
       return userJavaPath("/usr/bin/java");
-    } else if (System.getProperty("os.name").indexOf("Windows") != -1) {
+    } else if (osName.contains("windows")) {
       return userJavaPath("java.exe");
     } else {
       return userJavaPath("java");
@@ -303,13 +305,13 @@ public class HIDGogoExtension extends DefaultClassManager {
       return llb.toLogoList();
     }
   }
-  
+
   private class ReadSensors implements Reporter {
     @Override
     public Syntax getSyntax() {
       return SyntaxJ.reporterSyntax(Syntax.ListType());
     }
-    
+
     @Override
     public Object report(Argument[] arg0, Context arg1)
         throws ExtensionException, LogoException {
@@ -331,13 +333,13 @@ public class HIDGogoExtension extends DefaultClassManager {
       return llb.toLogoList();
     }
   }
-  
+
   private class ReadSensorNumber implements Reporter {
     @Override
     public Syntax getSyntax() {
       return SyntaxJ.reporterSyntax(new int[] {Syntax.NumberType() }, Syntax.NumberType());
     }
-    
+
     @Override
     public Object report(Argument[] args, Context arg1)
         throws ExtensionException, LogoException {
@@ -496,12 +498,12 @@ public class HIDGogoExtension extends DefaultClassManager {
       message[0] = (byte)0;
       message[1] = (byte)2;
       message[2] = (byte)0;
-      message[3] = (byte)0; //off  
+      message[3] = (byte)0; //off
 
       sendMessage(message);
     }
   }
-  
+
 
   private class OutputPortClockwise implements Command {
     @Override
@@ -514,14 +516,14 @@ public class HIDGogoExtension extends DefaultClassManager {
         throws ExtensionException, LogoException {
       byte[] message = new byte[64];
       message[0] = (byte)0;
-      message[1] = (byte)3;  
+      message[1] = (byte)3;
       message[2] = (byte)0;
       message[3] = (byte)1;  //cw
 
       sendMessage(message);
     }
   }
-  
+
   private class OutputPortCounterClockwise implements Command {
     @Override
     public Syntax getSyntax() {
@@ -533,13 +535,13 @@ public class HIDGogoExtension extends DefaultClassManager {
         throws ExtensionException, LogoException {
       byte[] message = new byte[64];
       message[0] = (byte)0;
-      message[1] = (byte)3;  
+      message[1] = (byte)3;
       message[2] = (byte)0;
       message[3] = (byte)0;  //ccw
       sendMessage(message);
     }
   }
-  
+
   private class SetServo implements Command {
     @Override
     public Syntax getSyntax() {
