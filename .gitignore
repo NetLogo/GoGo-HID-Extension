@@ -2,8 +2,8 @@ gogo.jar
 gogo.jar.pack.gz
 classes
 gogo-daemon.jar
-hid4java.jar
-jna.jar
+/hid4java.jar
+/jna.jar
 project/project
 project/target
 target/
