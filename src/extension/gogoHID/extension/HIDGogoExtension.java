@@ -150,7 +150,17 @@ public class HIDGogoExtension extends DefaultClassManager {
   private boolean stillRunning = false;
 
   private String userJavaPath(String defaultJava) {
-    if (org.nlogo.app.App$.MODULE$ != null && org.nlogo.app.App$.MODULE$.app() != null) {
+
+    int exit = 1;
+    try {
+      List<String> command = Arrays.asList( defaultJava, "-version" );
+      Process javaCheck = new ProcessBuilder(command).start();
+      exit = javaCheck.waitFor();
+    } catch(Exception e) {
+      System.err.println("Was not able to run java default: " + e.toString());
+    }
+
+    if (org.nlogo.app.App$.MODULE$ != null && org.nlogo.app.App$.MODULE$.app() != null && exit != 0) {
       try {
         return FileDialog.showFiles(org.nlogo.app.App$.MODULE$.app().frame(),
             "Please locate your java executable", java.awt.FileDialog.LOAD);
