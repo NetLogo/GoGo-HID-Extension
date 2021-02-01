@@ -2,6 +2,7 @@ package gogoHID.extension;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.file.Path;
 
 import org.nlogo.api.Argument;
 import org.nlogo.api.Context;
@@ -185,14 +186,16 @@ public class HIDGogoExtension extends DefaultClassManager {
     }
   }
 
-  private void bootHIDDaemon() throws ExtensionException{
+  private void bootHIDDaemon() throws ExtensionException {
     System.out.println("looking for system java, override by setting property " + javaLocationPropertyKey);
     String executable = System.getProperty(javaLocationPropertyKey);
     if (executable == null) {
       executable = javaExecutablePath();
     }
-    String gogoExtensionPath =
-      System.getProperty("netlogo.extensions.dir", "extensions") + File.separator + "gogo" + File.separator;
+    File gogoFile = new File(HIDGogoExtension.class.getProtectionDomain().getCodeSource().getLocation().getFile());
+    Path gogoParentPath = gogoFile.toPath().getParent();
+    String gogoExtensionPath = gogoParentPath.toString() + File.separator;
+    System.out.println("gogoExtensionPath: " + gogoExtensionPath);
     try {
       String classpath =
         new File(gogoExtensionPath + "gogo-daemon.jar").getCanonicalPath() + File.pathSeparator +
