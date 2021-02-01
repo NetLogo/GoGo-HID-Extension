@@ -1,5 +1,7 @@
 package gogoHID.extension;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.file.Path;
@@ -18,8 +20,11 @@ import org.nlogo.api.ExtensionManager;
 import org.nlogo.core.Syntax;
 import org.nlogo.core.SyntaxJ;
 
+import org.nlogo.app.App;
+
 import org.nlogo.awt.UserCancelException;
 
+import org.nlogo.swing.BrowserLauncher;
 import org.nlogo.swing.FileDialog;
 
 import java.util.List;
@@ -34,7 +39,7 @@ public class HIDGogoExtension extends DefaultClassManager {
 
   private class UnsuccessfulReadOperation extends Exception {};
 
-  private void alertToNewGogoBoards(String primitiveName) {
+  private void alertToNewGogoBoards(String primitiveName) throws ExtensionException {
     if(!shownErrorMessage) {
       while(true) {
         final int choice =
@@ -46,8 +51,14 @@ public class HIDGogoExtension extends DefaultClassManager {
         if (choice == 1) {
           break;
         }
-        org.nlogo.swing.BrowserLauncher.openURL
-          (org.nlogo.app.App.app().frame(), "https://github.com/NetLogo/NetLogo/wiki/GoGo-Upgrade", false);
+        URI uri = null;
+        try {
+          uri = new URI("https://github.com/NetLogo/NetLogo/wiki/GoGo-Upgrade");
+        } catch (URISyntaxException ex) {
+          System.getProperties().put("org.nlogo.gogo.shownErrorMessage", "");
+          throw new ExtensionException("Could not create GoGo upgrade URI?");
+        }
+        BrowserLauncher.openURI(App.app().frame(), uri);
       }
       System.getProperties().put("org.nlogo.gogo.shownErrorMessage", "");
       shownErrorMessage = true;
@@ -64,7 +75,7 @@ public class HIDGogoExtension extends DefaultClassManager {
     }
 
     public Syntax getSyntax() { return syntax; }
-    public Object report(Argument args[], Context context) {
+    public Object report(Argument args[], Context context) throws ExtensionException {
       alertToNewGogoBoards(primitiveName);
       return null;
     }
@@ -80,7 +91,7 @@ public class HIDGogoExtension extends DefaultClassManager {
     }
 
     public Syntax getSyntax() { return syntax; }
-    public void perform(Argument args[], Context context) {
+    public void perform(Argument args[], Context context) throws ExtensionException {
       alertToNewGogoBoards(primitiveName);
     }
   }
