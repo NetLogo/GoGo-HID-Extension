@@ -23,6 +23,7 @@ public class HIDGogoDaemon implements HidServicesListener {
         if (hidDevice.getVendorId() == 0x461 && hidDevice.getProductId() == 0x20) {
           //store a gogo as gogo (limitation of current implementation -- only allow one gogo)
           gogoBoard = hidServices.getHidDevice(0x461, 0x20, null);
+          System.err.println("GoGo board found, using this one: " + gogoBoard);
         }
       }
   }
@@ -89,27 +90,35 @@ public class HIDGogoDaemon implements HidServicesListener {
   }
 
   public static void main(String[] args) throws java.io.IOException {
-    System.err.println("Hid daemon started!");
+    System.err.println("HID daemon started!");
     HIDGogoDaemon d = new HIDGogoDaemon();
     d.boot();
-    while(true) {
+    boolean quit = false;
+    while (!quit) {
       int c = System.in.read();
-      if(c == 'S') {
+      if (c == 'S') {
         int numBytes = System.in.read();
         byte[] message = new byte[numBytes];
         System.in.read(message);
         d.write(message);
-      } else if(c == 'R') {
+      } else if (c == 'R') {
         int numBytes = System.in.read();
         byte[] message = new byte[numBytes];
         d.read(message);
         System.out.write(message);
         System.out.flush();
-      } else if(c == 'N') {
+      } else if (c == 'N') {
         System.out.write(d.getNumDevices());
         System.out.flush();
+      } else if (c == 'X') {
+        System.err.println("HID daemon quit code received.");
+        quit = true;
       }
     }
+    if (d != null && d.gogoBoard != null) {
+      d.gogoBoard.close();
+    }
+    System.err.println("HID daemon run complete.");
   }
-  
+
 }

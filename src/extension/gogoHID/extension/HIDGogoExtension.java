@@ -5,6 +5,7 @@ import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.file.Path;
+import java.util.concurrent.TimeUnit;
 
 import org.nlogo.api.Argument;
 import org.nlogo.api.Context;
@@ -152,6 +153,29 @@ public class HIDGogoExtension extends DefaultClassManager {
   }
 
   @Override public void unload(ExtensionManager pm) throws ExtensionException {
+    if (proc == null && !proc.isAlive()) {
+      System.err.println("Daemon process was not alive, not attempting to shut it down.");
+      return;
+    }
+
+    System.err.println("Unloading GoGo extension, shutting down daemon.");
+    try {
+      os.write('X');
+      os.flush();
+      proc.waitFor(5L, TimeUnit.SECONDS);
+      os.close();
+      is.close();
+      err.close();
+    } catch (IOException e) {
+      System.err.println("Failed to close GoGo extension resources.");
+      e.printStackTrace();
+      throw new ExtensionException("Failed to close GoGo extension resources");
+    } catch (InterruptedException e) {
+      System.err.println("Interrupted while closing GoGo extension resources.");
+      e.printStackTrace();
+      throw new ExtensionException("Interrupted while closing GoGo extension resources.");
+    }
+
     proc.destroy();
   }
 
