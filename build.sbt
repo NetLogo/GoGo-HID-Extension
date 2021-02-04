@@ -30,7 +30,7 @@ lazy val extension = project.
   settings(
     javaSource in Compile := baseDirectory.value.getParentFile / "src" / "extension" / "gogoHID",
     name := "gogo",
-    version := "2.0.3",
+    version := "2.0.4",
     netLogoClassManager := "gogoHID.extension.HIDGogoExtension",
     netLogoZipSources := false)
 
