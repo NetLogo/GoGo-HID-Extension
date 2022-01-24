@@ -153,7 +153,7 @@ public class HIDGogoExtension extends DefaultClassManager {
   }
 
   @Override public void unload(ExtensionManager pm) throws ExtensionException {
-    if (proc == null && !proc.isAlive()) {
+    if (proc == null || !proc.isAlive()) {
       System.err.println("Daemon process was not alive, not attempting to shut it down.");
       return;
     }
