@@ -1,5 +1,6 @@
 val baseSettings = Seq(
-  netLogoVersion := "6.1.1-c82c397",
+  resolvers      += "netlogo" at "https://dl.cloudsmith.io/public/netlogo/netlogo/maven/",
+  netLogoVersion := "6.2.0-d27b502",
   resourceDirectory in Compile := { baseDirectory.value / "resources" },
   scalacOptions ++= Seq("-deprecation", "-unchecked", "-Xlint", "-Xfatal-warnings",
                       "-encoding", "us-ascii"),
@@ -41,6 +42,3 @@ lazy val daemon = project.
     javaSource in Compile := baseDirectory.value.getParentFile / "src" / "daemon" / "gogoHID",
     artifactName := { (_, _, _) => "gogo-daemon.jar" }
   )
-
-resolvers      += "netlogo" at "https://dl.cloudsmith.io/public/netlogo/netlogo/maven/"
-netLogoVersion := "6.2.0-d27b502"
