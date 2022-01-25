@@ -153,6 +153,8 @@ public class HIDGogoExtension extends DefaultClassManager {
   }
 
   @Override public void unload(ExtensionManager pm) throws ExtensionException {
+    unloaded = true;
+
     if (proc == null || !proc.isAlive()) {
       System.err.println("Daemon process was not alive, not attempting to shut it down.");
       return;
@@ -184,6 +186,7 @@ public class HIDGogoExtension extends DefaultClassManager {
   private InputStream err = null;
   private Process proc = null;
   private boolean stillRunning = false;
+  private boolean unloaded = false;
 
   private String userJavaPath(String defaultJava) {
 
@@ -240,9 +243,10 @@ public class HIDGogoExtension extends DefaultClassManager {
         new File(gogoExtensionPath + "gogo.jar").getCanonicalPath() + File.pathSeparator +
         new File(gogoExtensionPath + "hid4java-0.7.0.jar").getCanonicalPath() + File.pathSeparator +
         new File(gogoExtensionPath + "jna-5.6.0.jar").getCanonicalPath();
-      List<String> command = Arrays.asList(executable, "-classpath", "\"" + classpath + "\"", "-showversion", "gogohid.daemon.HIDGogoDaemon");
-      System.out.println("running: " + Arrays.toString(command.toArray()));
-      proc = new ProcessBuilder(command).start();
+      List<String> command = Arrays.asList(executable, "-classpath", classpath, "-showversion", "gogohid.daemon.HIDGogoDaemon");
+      System.out.println("running: " + String.join(" ", command));
+      ProcessBuilder procBuilder = new ProcessBuilder(command);
+      proc = procBuilder.start();
       System.setProperty(javaLocationPropertyKey, executable);
       stillRunning = true;
       os = proc.getOutputStream();
@@ -284,7 +288,10 @@ public class HIDGogoExtension extends DefaultClassManager {
 
   private void sendMessage(byte[] bytes) throws ExtensionException {
     try {
-      if(!stillRunning) {
+      if (unloaded) {
+        return;
+      }
+      if (!stillRunning) {
         bootHIDDaemon();
       }
       os.write('S');
@@ -298,7 +305,11 @@ public class HIDGogoExtension extends DefaultClassManager {
 
   private byte[] receiveMessage(int numBytes) throws ExtensionException, UnsuccessfulReadOperation {
     try {
-      if(!stillRunning) {
+      if (unloaded) {
+        byte[] empty = new byte[0];
+        return empty;
+      }
+      if (!stillRunning) {
         bootHIDDaemon();
       }
       os.write('R');
@@ -315,7 +326,10 @@ public class HIDGogoExtension extends DefaultClassManager {
 
   private int numAttached() throws ExtensionException {
     try {
-      if(!stillRunning) {
+      if (unloaded) {
+        return 0;
+      }
+      if (!stillRunning) {
         bootHIDDaemon();
       }
       os.write('N');
