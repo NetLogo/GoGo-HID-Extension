@@ -221,6 +221,10 @@ public class HIDGogoExtension extends DefaultClassManager {
     }
   }
 
+  // I don't think it is necessary to run Java via a command line process, I think we
+  // can just spawn a process off from this one instead since everything is now
+  // contained in a single jar.  But I don't want to make big changes like that
+  // at the moment -Jeremy B January 2022
   private void bootHIDDaemon() throws ExtensionException {
     System.out.println("looking for system java, override by setting property " + javaLocationPropertyKey);
     String executable = System.getProperty(javaLocationPropertyKey);
@@ -233,9 +237,9 @@ public class HIDGogoExtension extends DefaultClassManager {
     System.out.println("gogoExtensionPath: " + gogoExtensionPath);
     try {
       String classpath =
-        new File(gogoExtensionPath + "gogo-daemon.jar").getCanonicalPath() + File.pathSeparator +
-        new File(gogoExtensionPath + "hid4java.jar").getCanonicalPath() + File.pathSeparator +
-        new File(gogoExtensionPath + "jna.jar").getCanonicalPath();
+        new File(gogoExtensionPath + "gogo.jar").getCanonicalPath() + File.pathSeparator +
+        new File(gogoExtensionPath + "hid4java-0.7.0.jar").getCanonicalPath() + File.pathSeparator +
+        new File(gogoExtensionPath + "jna-5.6.0.jar").getCanonicalPath();
       List<String> command = Arrays.asList(executable, "-classpath", "\"" + classpath + "\"", "-showversion", "gogohid.daemon.HIDGogoDaemon");
       System.out.println("running: " + Arrays.toString(command.toArray()));
       proc = new ProcessBuilder(command).start();
