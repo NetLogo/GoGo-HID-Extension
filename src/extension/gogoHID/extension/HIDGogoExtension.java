@@ -1,4 +1,4 @@
-package gogoHID.extension;
+package gogohid.extension;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -229,14 +229,14 @@ public class HIDGogoExtension extends DefaultClassManager {
     }
     File gogoFile = new File(HIDGogoExtension.class.getProtectionDomain().getCodeSource().getLocation().getFile());
     Path gogoParentPath = gogoFile.toPath().getParent();
-    String gogoExtensionPath = gogoParentPath.toString() + File.separator;
+    String gogoExtensionPath = gogoParentPath.toString().replaceAll("%20", " ") + File.separator;
     System.out.println("gogoExtensionPath: " + gogoExtensionPath);
     try {
       String classpath =
         new File(gogoExtensionPath + "gogo-daemon.jar").getCanonicalPath() + File.pathSeparator +
         new File(gogoExtensionPath + "hid4java.jar").getCanonicalPath() + File.pathSeparator +
         new File(gogoExtensionPath + "jna.jar").getCanonicalPath();
-      List<String> command = Arrays.asList(executable, "-classpath", classpath, "-showversion", "gogoHID.daemon.HIDGogoDaemon");
+      List<String> command = Arrays.asList(executable, "-classpath", "\"" + classpath + "\"", "-showversion", "gogohid.daemon.HIDGogoDaemon");
       System.out.println("running: " + Arrays.toString(command.toArray()));
       proc = new ProcessBuilder(command).start();
       System.setProperty(javaLocationPropertyKey, executable);

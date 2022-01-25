@@ -1,4 +1,4 @@
-package gogoHID.daemon;
+package gogohid.daemon;
 
 import org.hid4java.HidDevice;
 import org.hid4java.HidException;

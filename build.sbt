@@ -29,16 +29,16 @@ lazy val extension = project.
   enablePlugins(org.nlogo.build.NetLogoExtension).
   settings(baseSettings).
   settings(
-    javaSource in Compile := baseDirectory.value.getParentFile / "src" / "extension" / "gogoHID",
+    javaSource in Compile := baseDirectory.value.getParentFile / "src" / "extension" / "gogohid",
     name := "gogo",
     version := "2.0.5",
-    netLogoClassManager := "gogoHID.extension.HIDGogoExtension",
+    netLogoClassManager := "gogohid.extension.HIDGogoExtension",
     netLogoZipSources := false)
 
 lazy val daemon = project.
   settings(baseSettings).
   settings(
     name := "gogo-daemon",
-    javaSource in Compile := baseDirectory.value.getParentFile / "src" / "daemon" / "gogoHID",
+    javaSource in Compile := baseDirectory.value.getParentFile / "src" / "daemon" / "gogohid",
     artifactName := { (_, _, _) => "gogo-daemon.jar" }
   )
