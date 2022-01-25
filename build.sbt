@@ -16,6 +16,8 @@ name := "gogo"
 
 version := "2.0.6"
 
+isSnapshot := true
+
 netLogoClassManager := "gogohid.extension.HIDGogoExtension"
 
 netLogoTarget := NetLogoExtension.directoryTarget(baseDirectory.value)
