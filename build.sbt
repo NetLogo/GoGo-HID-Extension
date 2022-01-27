@@ -14,7 +14,7 @@ javaSource in Compile := baseDirectory.value / "src"
 
 name := "gogo"
 
-version := "2.0.7"
+version := "2.0.8"
 
 isSnapshot := true
 
