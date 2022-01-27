@@ -35,6 +35,7 @@ import java.io.*;
 public class HIDGogoExtension extends DefaultClassManager {
 
   static final String javaLocationPropertyKey = "netlogo.extensions.gogo.javaexecutable";
+  static final int NUM_SENSORS = 8;
 
   private boolean shownErrorMessage = false;
 
@@ -303,6 +304,39 @@ public class HIDGogoExtension extends DefaultClassManager {
     }
   }
 
+  private short[] readSensors() throws ExtensionException, UnsuccessfulReadOperation {
+    short[] sensors = readSensorsEx();
+    // At some point with a new "batch" of GoGo boards, they started returning data
+    // in a different format (probably long instead of short), but the values were still
+    // only in the short range.  This means since we just read the data at 64 bytes at
+    // a time, we get every other read as "all zeroes".  Since I don't have info on
+    // how to differentiate the GoGo board versions in order to do things properly
+    // we have this hacky workaround to purge any "all zeroes" readings.  We only run it
+    // once, so if the sensors are on the old/short version and really are reading all
+    // zeroes, at least that data will be relayed.  -Jeremy B January 2022
+    boolean allAreZero = true;
+    for (int index = 0; index < NUM_SENSORS; index++) {
+      if (sensors[index] != 0) {
+        allAreZero = false;
+      }
+    }
+    if (allAreZero) {
+      sensors = readSensorsEx();
+    }
+    return sensors;
+  }
+
+  private short[] readSensorsEx() throws ExtensionException, UnsuccessfulReadOperation {
+    byte[] data = receiveMessage(64);
+    short[] sensors = new short[NUM_SENSORS];
+    for (int index = 0; index < NUM_SENSORS; index++) {
+      ByteBuffer bb = ByteBuffer.wrap(data, (2 * index) + 1, 2);
+      bb.order(ByteOrder.BIG_ENDIAN);
+      sensors[index] = bb.getShort();
+    }
+    return sensors;
+  }
+
   private byte[] receiveMessage(int numBytes) throws ExtensionException, UnsuccessfulReadOperation {
     try {
       if (unloaded) {
@@ -381,16 +415,12 @@ public class HIDGogoExtension extends DefaultClassManager {
     @Override
     public Object report(Argument[] arg0, Context arg1)
         throws ExtensionException, LogoException {
-      short[] sensors = new short[8];
+      short[] sensors = null;
       try {
-        byte[] data = receiveMessage(64);
-        for (int index = 0; index < 8; index++) {
-          ByteBuffer bb = ByteBuffer.wrap(data,(2*index) + 1,2 );
-          bb.order(ByteOrder.BIG_ENDIAN);
-          sensors[index] = bb.getShort();
-        }
-      } catch(UnsuccessfulReadOperation e) {
+        sensors = readSensors();
+      } catch (UnsuccessfulReadOperation e) {
         System.err.println("Couldn't read from gogo board");
+        return (new LogoListBuilder()).toLogoList();
       }
       LogoListBuilder llb = new LogoListBuilder();
       for (int i = 0; i< sensors.length; i++) {
@@ -410,16 +440,13 @@ public class HIDGogoExtension extends DefaultClassManager {
     public Object report(Argument[] args, Context arg1)
         throws ExtensionException, LogoException {
       int sensorNumber = args[0].getIntValue();
-      if ((sensorNumber > 8) || (sensorNumber < 1)) {
+      if ((sensorNumber > NUM_SENSORS) || (sensorNumber < 1)) {
         throw new ExtensionException("Sensor Number must be between 1 and 8 (inclusive).  You entered " + sensorNumber);
       }
       Short sensorReading = 0;
       try {
-        byte[] data = receiveMessage(64);
-
-        ByteBuffer bb = ByteBuffer.wrap(data,(2*(sensorNumber-1)) + 1,2 );
-        bb.order(ByteOrder.BIG_ENDIAN);
-        sensorReading = bb.getShort();
+        short[] sensors = readSensors();
+        sensorReading = sensors[sensorNumber - 1];
       } catch(UnsuccessfulReadOperation e) {
         System.err.println("Couldn't read from gogo board");
       }
