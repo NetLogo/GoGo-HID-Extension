@@ -1,8 +1,5 @@
-*.jar
-gogo.jar.pack.gz
-classes
-project/project
-project/target
-target/
-/extension/
 .bundledFiles
+target/
+extensions/
+/*.jar
+/*.zip
