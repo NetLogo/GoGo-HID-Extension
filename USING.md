@@ -8,11 +8,19 @@ extensions [ gogo ]
 
 If your model already uses other extensions, then it already has an extensions line in it, so just add gogo to the list.
 
-After loading the extension, you can see whether one or more HID-based gogos are on and attached to the computer by typing the following into the command center:
+After loading the extension, you can see if the gogo board is connected by seeing if it will beep when you type into the command center:
+    
+```
+gogo:beep
+```
+
+Or, you can see whether one or more HID-based gogos are on and attached to the computer by typing the following into the command center:
 
 ```NetLogo
 gogo:howmany-gogos
 ```
+
+For examples that use the GoGo extension see GoGoMonitor and GoGoMonitorSimple models in the Models Library and the example projects at the bottom of this page.
 
 ## Changes
 
