@@ -37,6 +37,9 @@ public class HIDGogo6Daemon implements HidServicesListener {
       throw new RuntimeException("Error in loading HID services");
     }
 
+    if(gogoBoard == null || !gogoBoard.open()) {
+      throw new RuntimeException("Failed to open device");
+    }
   }
 
   private void write(byte[] message) {
