@@ -667,8 +667,8 @@ public class HIDGogoExtension extends DefaultClassManager {
       LogoList messageList = args[0].getList();
       byte[] message = new byte[64];
       for (int i = 0; i<messageList.size() && i < 64; i++) {
-        Object val = messageList.get(i);
-        int v = (Integer)val;
+        Double val = (Double)messageList.get(i);
+        int v = val.intValue();
         message[i] = (byte)v;
       }
       sendMessage(message);
