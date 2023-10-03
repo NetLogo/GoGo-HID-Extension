@@ -120,6 +120,7 @@ public class HIDGogoExtension extends DefaultClassManager {
     pm.addPrimitive("output-port-clockwise", new OutputPortClockwise() );
     pm.addPrimitive("output-port-counterclockwise", new OutputPortCounterClockwise() );
 
+    pm.addPrimitive("talk-to-servos", new TalkToServo() );
     pm.addPrimitive("set-servo", new SetServo() );
 
     pm.addPrimitive("read-all", new ReadAll() );
@@ -632,6 +633,49 @@ public class HIDGogoExtension extends DefaultClassManager {
       message[1] = (byte)3;
       message[2] = (byte)0;
       message[3] = (byte)0;  //ccw
+      sendMessage(message);
+    }
+  }
+
+  private class TalkToServo implements Command {
+    @Override
+    public Syntax getSyntax() {
+      return SyntaxJ.commandSyntax(new int[] {Syntax.ListType() });
+    }
+
+    @Override
+    public void perform(Argument args[], Context context)
+        throws ExtensionException, org.nlogo.api.LogoException {
+      java.util.Iterator<?> iter = args[0].getList().javaIterator();
+
+      int serverPortMask = 0;
+      while (iter.hasNext()) {
+        Object val = iter.next();
+        switch (val.toString().toLowerCase().charAt(0)) {
+          case 'a':
+          case 'A':
+            serverPortMask = serverPortMask  | 1;
+            break;
+          case 'b':
+          case 'B':
+            serverPortMask = serverPortMask  | 2;
+            break;
+          case 'c':
+          case 'C':
+            serverPortMask = serverPortMask  | 4;
+            break;
+          case 'd':
+          case 'D':
+            serverPortMask = serverPortMask  | 8;
+            break;
+        }
+      }
+
+      byte[] message = new byte[64];
+      message[0] = (byte)0;
+      message[1] = (byte)14;
+      message[2] = (byte)serverPortMask;
+      message[3] = (byte)0;
       sendMessage(message);
     }
   }
