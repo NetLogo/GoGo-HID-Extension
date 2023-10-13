@@ -1,4 +1,4 @@
-package gogohid.daemon6;
+package gogohid.daemon;
 
 import org.hid4java.HidDevice;
 import org.hid4java.HidException;
@@ -11,6 +11,35 @@ public class HIDGogo6Daemon implements HidServicesListener {
 
   private HidServices hidServices;
   private HidDevice gogoBoard;
+  private byte[] readBuffer;
+  private Thread readThread;
+
+  private static class ReadThread extends Thread {
+
+    private static final int READ_DELAY = 30;
+    private HIDGogo6Daemon d;
+
+    ReadThread(HIDGogo6Daemon d) {
+      this.d = d;
+    }
+
+    public void run() {
+      try {
+        while (true) {
+          synchronized (d.readBuffer) {
+            if(d.gogoBoard != null) {
+              d.gogoBoard.read(d.readBuffer, 200);
+            }
+          }
+	  // Sleep a bit so that the main thread gets a chance to access
+	  // readBuffer.
+	  Thread.sleep(READ_DELAY);
+        }
+      } catch(InterruptedException ex) {
+        // Do nothing. We just need to exit the loop.
+      }
+    }
+  }
 
   private void loadUpHIDServices() throws HidException  {
     // Get HID services and store
@@ -40,6 +69,14 @@ public class HIDGogo6Daemon implements HidServicesListener {
     if(gogoBoard == null || !gogoBoard.open()) {
       throw new RuntimeException("Failed to open device");
     }
+
+    readBuffer = new byte[64];
+    readThread = new Thread(new ReadThread(this));
+    readThread.start();
+  }
+
+  public void shutDown() {
+    readThread.interrupt();
   }
 
   private void write(byte[] message) {
@@ -49,8 +86,8 @@ public class HIDGogo6Daemon implements HidServicesListener {
   }
 
   private void read(byte[] message) {
-    if(gogoBoard != null) {
-      gogoBoard.read(message, 200);
+    synchronized (readBuffer) {
+      System.arraycopy(readBuffer, 0, message, 0, message.length);
     }
   }
 
@@ -99,7 +136,6 @@ public class HIDGogo6Daemon implements HidServicesListener {
 
   public static void main(String[] args) throws java.io.IOException {
     System.err.println("HID daemon started!");
-    System.err.println("GOGO6");
     HIDGogo6Daemon d = new HIDGogo6Daemon();
     d.boot();
     boolean quit = false;
@@ -124,6 +160,7 @@ public class HIDGogo6Daemon implements HidServicesListener {
         quit = true;
       }
     }
+    d.shutDown();
     if (d != null && d.gogoBoard != null) {
       d.gogoBoard.close();
     }
