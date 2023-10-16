@@ -36,6 +36,7 @@ public class HIDGogoExtension extends DefaultClassManager {
 
   static final String javaLocationPropertyKey = "netlogo.extensions.gogo.javaexecutable";
   static final int NUM_SENSORS = 8;
+  static final boolean USING_GOGO6 = true;
 
   private boolean shownErrorMessage = false;
 
@@ -244,7 +245,7 @@ public class HIDGogoExtension extends DefaultClassManager {
         new File(gogoExtensionPath + "gogo.jar").getCanonicalPath() + File.pathSeparator +
         new File(gogoExtensionPath + "hid4java-0.7.0.jar").getCanonicalPath() + File.pathSeparator +
         new File(gogoExtensionPath + "jna-5.6.0.jar").getCanonicalPath();
-      List<String> command = Arrays.asList(executable, "-classpath", classpath, "-showversion", "gogohid.daemon.HIDGogoDaemon");
+      List<String> command = Arrays.asList(executable, "-classpath", classpath, "-showversion", USING_GOGO6 ? "gogohid.daemon.HIDGogo6Daemon" : "gogohid.daemon.HIDGogoDaemon");
       System.out.println("running: " + String.join(" ", command));
       ProcessBuilder procBuilder = new ProcessBuilder(command);
       proc = procBuilder.start();
