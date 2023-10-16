@@ -89,6 +89,11 @@ public class HIDGogo6Daemon implements HidServicesListener {
     System.err.println("HID failure");
   }
 
+  @Override
+  public void hidDataReceived(HidServicesEvent event) {
+    // We don't need to process any received data right now.
+  }
+
   public static void main(String[] args) throws java.io.IOException {
     System.err.println("HID daemon started!");
     System.err.println("GOGO6");

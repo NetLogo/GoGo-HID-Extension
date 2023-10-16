@@ -243,7 +243,7 @@ public class HIDGogoExtension extends DefaultClassManager {
     try {
       String classpath =
         new File(gogoExtensionPath + "gogo.jar").getCanonicalPath() + File.pathSeparator +
-        new File(gogoExtensionPath + "hid4java-0.7.0.jar").getCanonicalPath() + File.pathSeparator +
+        new File(gogoExtensionPath + "hid4java-develop-SNAPSHOT.jar").getCanonicalPath() + File.pathSeparator +
         new File(gogoExtensionPath + "jna-5.6.0.jar").getCanonicalPath();
       List<String> command = Arrays.asList(executable, "-classpath", classpath, "-showversion", USING_GOGO6 ? "gogohid.daemon.HIDGogo6Daemon" : "gogohid.daemon.HIDGogoDaemon");
       System.out.println("running: " + String.join(" ", command));
