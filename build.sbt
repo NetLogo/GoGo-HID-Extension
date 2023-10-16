@@ -14,7 +14,11 @@ javacOptions ++= Seq("-g", "-deprecation", "-Xlint:all", "-Xlint:-serial", "-Xli
 netLogoVersion := "6.3.0"
 netLogoClassManager := "gogohid.extension.HIDGogoExtension"
 
+netLogoPackageExtras ++= Seq(
+  (baseDirectory.value / "lib" / "hid4java-develop-SNAPSHOT.jar", None)
+)
+
 libraryDependencies ++= Seq(
-  // if the `hid4java` version changes, make sure to update the jar path in `HIDGogoExtension`, too.
-  "org.hid4java" % "hid4java" % "0.7.0"
+  // Required by hid4java
+  "net.java.dev.jna" % "jna" % "5.6.0"
 )
