@@ -36,7 +36,6 @@ public class HIDGogoExtension extends DefaultClassManager {
 
   static final String javaLocationPropertyKey = "netlogo.extensions.gogo.javaexecutable";
   static final int NUM_SENSORS = 8;
-  static final boolean USING_GOGO6 = true;
 
   private boolean shownErrorMessage = false;
 
@@ -106,6 +105,8 @@ public class HIDGogoExtension extends DefaultClassManager {
 
     pm.addPrimitive("primitives", new Prims() );
 
+    pm.addPrimitive("init", new Init() );
+
     pm.addPrimitive("beep", new Beep() );
 
     pm.addPrimitive("read-sensors", new ReadSensors() );
@@ -144,14 +145,6 @@ public class HIDGogoExtension extends DefaultClassManager {
     pm.addPrimitive("sensor", new OldReporter("sensor", SyntaxJ.reporterSyntax(new int[] {Syntax.NumberType()}, Syntax.NumberType())));
     pm.addPrimitive("set-burst-mode", new OldCommand("set-burst-mode", SyntaxJ.commandSyntax(new int[] {Syntax.ListType(), Syntax.BooleanType()})));
     pm.addPrimitive("stop-burst-mode", new OldCommand("stop-burst-mode", SyntaxJ.commandSyntax()));
-
-    try {
-      bootHIDDaemon();
-    } catch (Exception e) {
-      System.err.println("FAILED TO BOOT DAEMON");
-      e.printStackTrace();
-      throw new ExtensionException("Error in loading HID services");
-    }
 
   }
 
@@ -231,7 +224,7 @@ public class HIDGogoExtension extends DefaultClassManager {
   // can just spawn a process off from this one instead since everything is now
   // contained in a single jar.  But I don't want to make big changes like that
   // at the moment -Jeremy B January 2022
-  private void bootHIDDaemon() throws ExtensionException {
+  private void bootHIDDaemon(final boolean useGoGo6) throws ExtensionException {
     System.out.println("looking for system java, override by setting property " + javaLocationPropertyKey);
     String executable = System.getProperty(javaLocationPropertyKey);
     if (executable == null) {
@@ -246,7 +239,7 @@ public class HIDGogoExtension extends DefaultClassManager {
         new File(gogoExtensionPath + "gogo.jar").getCanonicalPath() + File.pathSeparator +
         new File(gogoExtensionPath + "hid4java-develop-SNAPSHOT.jar").getCanonicalPath() + File.pathSeparator +
         new File(gogoExtensionPath + "jna-5.6.0.jar").getCanonicalPath();
-      List<String> command = Arrays.asList(executable, "-classpath", classpath, "-showversion", USING_GOGO6 ? "gogohid.daemon.HIDGogo6Daemon" : "gogohid.daemon.HIDGogoDaemon");
+      List<String> command = Arrays.asList(executable, "-classpath", classpath, "-showversion", useGoGo6 ? "gogohid.daemon.HIDGogo6Daemon" : "gogohid.daemon.HIDGogoDaemon");
       System.out.println("running: " + String.join(" ", command));
       ProcessBuilder procBuilder = new ProcessBuilder(command);
       proc = procBuilder.start();
@@ -295,7 +288,7 @@ public class HIDGogoExtension extends DefaultClassManager {
         return;
       }
       if (!stillRunning) {
-        bootHIDDaemon();
+        bootHIDDaemon(false);
       }
       os.write('S');
       os.write(bytes.length);
@@ -346,7 +339,7 @@ public class HIDGogoExtension extends DefaultClassManager {
         return empty;
       }
       if (!stillRunning) {
-        bootHIDDaemon();
+        bootHIDDaemon(false);
       }
       os.write('R');
       os.write(numBytes);
@@ -366,7 +359,7 @@ public class HIDGogoExtension extends DefaultClassManager {
         return 0;
       }
       if (!stillRunning) {
-        bootHIDDaemon();
+        bootHIDDaemon(false);
       }
       os.write('N');
       os.flush();
@@ -454,6 +447,42 @@ public class HIDGogoExtension extends DefaultClassManager {
       }
 
       return sensorReading.doubleValue();
+    }
+  }
+
+  private class Init implements Command {
+    @Override
+    public Syntax getSyntax() {
+      return SyntaxJ.commandSyntax(new int[] {Syntax.StringType() });
+    }
+
+    @Override
+    public void perform(Argument[] args, Context arg1)
+        throws ExtensionException, LogoException {
+      try {
+        if (stillRunning) {
+          throw new ExtensionException("Attempted to initialize a daemon but there's already one running");
+        }
+
+        final String daemonName = args[0].getString();
+
+        switch (daemonName) {
+          case "gogo":
+          bootHIDDaemon(false);
+          break;
+
+          case "gogo6":
+          bootHIDDaemon(true);
+          break;
+
+          default:
+          throw new ExtensionException("Unknown daemon name: " + daemonName);
+        }
+      } catch (Exception e) {
+        System.err.println("FAILED TO BOOT DAEMON");
+        e.printStackTrace();
+        throw new ExtensionException("Error in loading HID services");
+      }
     }
   }
 
