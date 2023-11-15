@@ -8,7 +8,13 @@ extensions [ gogo ]
 
 If your model already uses other extensions, then it already has an extensions line in it, so just add gogo to the list.
 
-After loading the extension, you can see if the gogo board is connected by seeing if it will beep when you type into the command center:
+If you are using a GoGo board 6, you will also need to initialize the extension by typing the following command into the command center:
+
+```
+gogo:init "gogo6"
+```
+
+You can see if the GoGo board is connected by seeing if it will beep when you type into the command center:
     
 ```
 gogo:beep
