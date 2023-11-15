@@ -79,7 +79,13 @@ extensions [ gogo ]
 
 If your model already uses other extensions, then it already has an extensions line in it, so just add gogo to the list.
 
-After loading the extension, you can see if the gogo board is connected by seeing if it will beep when you type into the command center:
+If you are using a GoGo board 6, you will also need to initialize the extension by typing the following command into the command center:
+
+```
+gogo:init "gogo6"
+```
+
+You can see if the GoGo board is connected by seeing if it will beep when you type into the command center:
     
 ```
 gogo:beep
@@ -117,6 +123,7 @@ Compared to previous versions of the GoGo extension, this version offers:
 
 [`gogo:primitives`](#gogoprimitives)
 [`gogo:howmany-gogos`](#gogohowmany-gogos)
+[`gogo:init`](#gogoinit)
 
 ### Sensors
 
@@ -126,6 +133,7 @@ Compared to previous versions of the GoGo extension, this version offers:
 ### Outputs and Servos
 
 [`gogo:talk-to-output-ports`](#gogotalk-to-output-ports)
+[`gogo:talk-to-servo-ports`](#gogotalk-to-servo-ports)
 [`gogo:set-output-port-power`](#gogoset-output-port-power)
 [`gogo:output-port-on`](#gogooutput-port-on)
 [`gogo:output-port-off`](#gogooutput-port-off)
@@ -155,6 +163,17 @@ Reports the number of USB HID devices visible to the computer and having the cor
 
 
 
+### `gogo:init`
+
+```NetLogo
+gogo:init
+```
+
+
+Initialize the extension. The parameter `name` is a string representing the name of the backend to initialize.  There are currently 2 backends. One is the `"gogo"` backend that supports GoGo board 5 and earlier versions. Another is the `"gogo6"` backend that supports GoGo board 6.  You only need to use this primitive if you are using a GoGo board 6.  The extension will automatically initialize itself with the `"gogo"` backend if this primitive is not called.
+
+
+
 ### `gogo:talk-to-output-ports`
 
 ```NetLogo
@@ -162,6 +181,19 @@ gogo:talk-to-output-ports list-of-portnames
 ```
 
 Establishes a list of output ports that will be controlled with subsequent output-port commands.  See below...
+
+
+### `gogo:talk-to-servo-ports`
+
+```NetLogo
+gogo:talk-to-servo-ports list-of-portnames
+```
+
+
+Establishes a list of servo ports that will be controlled with subsequent output-port commands.  See below...
+
+This command is only available with the "gogo6" backend.
+
 
 
 ### `gogo:set-output-port-power`
