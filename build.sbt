@@ -11,7 +11,7 @@ Compile / resourceDirectory := { baseDirectory.value / "resources" }
 Compile / javaSource := baseDirectory.value / "src"
 javacOptions ++= Seq("-g", "-deprecation", "-Xlint:all", "-Xlint:-serial", "-Xlint:-path", "-encoding", "us-ascii", "--release", "11")
 
-netLogoVersion := "6.3.0"
+netLogoVersion := "7.0.0-internal1-df97144"
 netLogoClassManager := "gogohid.extension.HIDGogoExtension"
 
 netLogoPackageExtras ++= Seq(
