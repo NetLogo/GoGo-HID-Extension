@@ -27,10 +27,14 @@ import org.nlogo.awt.UserCancelException;
 
 import org.nlogo.swing.BrowserLauncher;
 import org.nlogo.swing.FileDialog;
+import org.nlogo.swing.OptionPane;
 
 import java.util.List;
 import java.util.Arrays;
 import java.io.*;
+import java.util.ArrayList;
+
+import scala.collection.JavaConverters;
 
 public class HIDGogoExtension extends DefaultClassManager {
 
@@ -45,11 +49,9 @@ public class HIDGogoExtension extends DefaultClassManager {
     if(!shownErrorMessage) {
       while(true) {
         final int choice =
-            org.nlogo.swing.OptionDialog.showMessage
-                (org.nlogo.app.App.app().frame(),
-                    "GoGo Extension has been updated!",
-                    "This model is using a primitive (gogo:" + primitiveName + ") from the old version of the GoGo extension.  Use gogo-serial for older GoGo boards.",
-                    new String[]{"More Information", "Close"});
+            new OptionPane(App.app().frame(), "GoGo Extension has been updated!",
+                           "This model is using a primitive (gogo:" + primitiveName + ") from the old version of the GoGo extension. Use gogo-serial for older GoGo boards.",
+                           JavaConverters.asScalaBuffer(Arrays.asList(new String[] { "More Information", "Close" })).toSeq()).getSelectedIndex();
         if (choice == 1) {
           break;
         }
