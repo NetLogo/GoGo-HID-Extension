@@ -22,10 +22,6 @@ import org.nlogo.api.ExtensionManager;
 import org.nlogo.core.Syntax;
 import org.nlogo.core.SyntaxJ;
 
-import org.nlogo.app.App;
-
-import org.nlogo.awt.UserCancelException;
-
 import org.nlogo.swing.BrowserLauncher;
 import org.nlogo.swing.FileDialog;
 import org.nlogo.swing.OptionPane;
@@ -41,28 +37,34 @@ public class HIDGogoExtension extends DefaultClassManager {
 
   static final int NUM_SENSORS = 8;
 
+  private boolean isHeadless = true;
+
   private boolean shownErrorMessage = false;
 
   private class UnsuccessfulReadOperation extends Exception {};
 
   private void alertToNewGogoBoards(String primitiveName) throws ExtensionException {
     if(!shownErrorMessage) {
-      while(true) {
-        final int choice =
-            new OptionPane(App.app().frame(), "GoGo Extension has been updated!",
-                           "This model is using a primitive (gogo:" + primitiveName + ") from the old version of the GoGo extension. Use gogo-serial for older GoGo boards.",
-                           CollectionConverters.asScala(Arrays.asList(new String[] { "More Information", "Close" })).toSeq()).getSelectedIndex();
-        if (choice == 1) {
-          break;
+      if (isHeadless) {
+        System.out.println("This model is using a primitive (gogo:" + primitiveName + ") from the old version of the GoGo extension. Use gogo-serial for older GoGo boards.");
+      } else {
+        while(true) {
+          final int choice =
+              new OptionPane(null, "GoGo Extension has been updated!",
+                            "This model is using a primitive (gogo:" + primitiveName + ") from the old version of the GoGo extension. Use gogo-serial for older GoGo boards.",
+                            JavaConverters.asScalaBuffer(Arrays.asList(new String[] { "More Information", "Close" })).toSeq()).getSelectedIndex();
+          if (choice == 1) {
+            break;
+          }
+          URI uri = null;
+          try {
+            uri = new URI("https://github.com/NetLogo/NetLogo/wiki/GoGo-Upgrade");
+          } catch (URISyntaxException ex) {
+            System.getProperties().put("org.nlogo.gogo.shownErrorMessage", "");
+            throw new ExtensionException("Could not create GoGo upgrade URI?");
+          }
+          BrowserLauncher.openURI(null, uri);
         }
-        URI uri = null;
-        try {
-          uri = new URI("https://github.com/NetLogo/NetLogo/wiki/GoGo-Upgrade");
-        } catch (URISyntaxException ex) {
-          System.getProperties().put("org.nlogo.gogo.shownErrorMessage", "");
-          throw new ExtensionException("Could not create GoGo upgrade URI?");
-        }
-        BrowserLauncher.openURI(App.app().frame(), uri);
       }
       System.getProperties().put("org.nlogo.gogo.shownErrorMessage", "");
       shownErrorMessage = true;
@@ -148,6 +150,11 @@ public class HIDGogoExtension extends DefaultClassManager {
     pm.addPrimitive("set-burst-mode", new OldCommand("set-burst-mode", SyntaxJ.commandSyntax(new int[] {Syntax.ListType(), Syntax.BooleanType()})));
     pm.addPrimitive("stop-burst-mode", new OldCommand("stop-burst-mode", SyntaxJ.commandSyntax()));
 
+  }
+
+  @Override
+  public void runOnce(ExtensionManager manager) throws ExtensionException {
+    isHeadless = !manager.workspaceContext().workspaceGUI();
   }
 
   @Override public void unload(ExtensionManager pm) throws ExtensionException {
