@@ -1,3 +1,7 @@
+import java.io.InputStream
+import java.net.URL
+import java.nio.file.{ Files, Paths, StandardCopyOption }
+
 import org.nlogo.build.{ NetLogoExtension, ExtensionDocumentationPlugin }
 
 enablePlugins(NetLogoExtension, ExtensionDocumentationPlugin)
@@ -19,7 +23,20 @@ netLogoPackageExtras ++= Seq(
   (baseDirectory.value / "lib" / "jna-5.8.0.jar", None)
 )
 
-libraryDependencies ++= Seq(
-  // Required by hid4java
-  "net.java.dev.jna" % "jna" % "5.8.0"
-)
+// Note that we don't care about it being a dependency.  The JVM that loads this code doesn't even want to load this
+// particular version of JNA.  It's only the GoGo daemon that should be loading this version of JNA.
+// --Jason B. (10/28/25)
+lazy val downloadJNA = taskKey[Unit]("Obtain the JNA '.jar' file")
+
+downloadJNA := {
+  val url    = new URL("https://repo1.maven.org/maven2/net/java/dev/jna/jna/5.8.0/jna-5.8.0.jar")
+  val urlIS  = url.openStream()
+  val target = Paths.get("lib/jna.jar")
+  try {
+    Files.copy(urlIS, target, StandardCopyOption.REPLACE_EXISTING)
+  } finally {
+    urlIS.close()
+  }
+}
+
+Compile / compile := ((Compile / compile).dependsOn(downloadJNA)).value

@@ -3,5 +3,6 @@
 target/
 extensions/
 extension/
+/lib/jna.jar
 /*.jar
 /*.zip
