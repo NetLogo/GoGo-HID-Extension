@@ -15,10 +15,11 @@ netLogoVersion      := "7.0.0-beta2-7e8f7a4"
 netLogoClassManager := "gogohid.extension.HIDGogoExtension"
 
 netLogoPackageExtras ++= Seq(
-  (baseDirectory.value / "lib" / "hid4java-develop-SNAPSHOT.jar", None)
+  (baseDirectory.value / "lib" / "hid4java-develop-SNAPSHOT.jar", None),
+  (baseDirectory.value / "lib" / "jna-5.8.0.jar", None)
 )
 
 libraryDependencies ++= Seq(
   // Required by hid4java
-  "net.java.dev.jna" % "jna" % "5.6.0"
+  "net.java.dev.jna" % "jna" % "5.8.0"
 )
