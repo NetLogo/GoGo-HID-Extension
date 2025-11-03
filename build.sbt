@@ -20,7 +20,7 @@ netLogoClassManager := "gogohid.extension.HIDGogoExtension"
 
 netLogoPackageExtras ++= Seq(
   (baseDirectory.value / "lib" / "hid4java-develop-SNAPSHOT.jar", None),
-  (baseDirectory.value / "lib" / "jna-5.8.0.jar", None)
+  (baseDirectory.value / "lib" / "jna.jar", None)
 )
 
 // Note that we don't care about it being a dependency.  The JVM that loads this code doesn't even want to load this
