@@ -1,5 +1,5 @@
 import java.io.InputStream
-import java.net.URL
+import java.net.URI
 import java.nio.file.{ Files, Paths, StandardCopyOption }
 
 import org.nlogo.build.{ NetLogoExtension, ExtensionDocumentationPlugin }
@@ -34,7 +34,7 @@ downloadJNA := {
   val target = Paths.get("lib/jna.jar")
 
   if (!Files.exists(target)) {
-    val url    = new URL("https://repo1.maven.org/maven2/net/java/dev/jna/jna/5.8.0/jna-5.8.0.jar")
+    val url    = new URI("https://repo1.maven.org/maven2/net/java/dev/jna/jna/5.8.0/jna-5.8.0.jar").toURL
     val urlIS  = url.openStream()
     try {
       Files.copy(urlIS, target, StandardCopyOption.REPLACE_EXISTING)
