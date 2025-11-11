@@ -153,6 +153,10 @@ public class HIDGogoExtension extends DefaultClassManager {
   @Override public void unload(ExtensionManager pm) throws ExtensionException {
     unloaded = true;
 
+    killProc();
+  }
+
+  private void killProc() throws ExtensionException {
     if (proc == null || !proc.isAlive()) {
       System.err.println("Daemon process was not alive, not attempting to shut it down.");
       return;
@@ -245,6 +249,17 @@ public class HIDGogoExtension extends DefaultClassManager {
       System.out.println("running: " + String.join(" ", command));
       ProcessBuilder procBuilder = new ProcessBuilder(command);
       proc = procBuilder.start();
+      // this ensures that the daemon exits if NetLogo is closed while gogo is loaded (Isaac B 11/11/25)
+      Runtime.getRuntime().addShutdownHook(new Thread() {
+        @Override
+        public void run() {
+          try {
+            killProc();
+          } catch (ExtensionException ex) {
+            // ignore, can't do anything if the app is already closing (Isaac B 11/11/25)
+          }
+        }
+      });
       System.setProperty(javaLocationPropertyKey, executable);
       stillRunning = true;
       os = proc.getOutputStream();
