@@ -15,7 +15,7 @@ gogo:init "gogo6"
 ```
 
 You can see if the GoGo board is connected by seeing if it will beep when you type into the command center:
-    
+
 ```
 gogo:beep
 ```

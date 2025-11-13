@@ -31,9 +31,9 @@ public class HIDGogo6Daemon implements HidServicesListener {
               d.gogoBoard.read(d.readBuffer, 200);
             }
           }
-	  // Sleep a bit so that the main thread gets a chance to access
-	  // readBuffer.
-	  Thread.sleep(READ_DELAY);
+    // Sleep a bit so that the main thread gets a chance to access
+    // readBuffer.
+    Thread.sleep(READ_DELAY);
         }
       } catch(InterruptedException ex) {
         // Do nothing. We just need to exit the loop.

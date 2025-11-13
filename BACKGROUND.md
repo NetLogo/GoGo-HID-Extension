@@ -25,12 +25,12 @@ Up to 8 sensors (i.e., temperature, light, pressure) and 4 output devices (i.e.,
 
 ### Sensor and actuator toolkits
 
-NetLogo models can interact with the physical world in two ways. First, they can gather data from the environment. This information can be used by the model to change or calibrate its behavior. This data is gathered using electronic sensors, which can measure a wide range of phenomena: temperature, light, touch (see pictures below), pH, chemical concentration, pressure, etc. See the [Gogo docs here](https://docs.gogoboard.org/#/en/sensor/sensor-set) for info on the the sensors that are included with a GoGo board kit. 
+NetLogo models can interact with the physical world in two ways. First, they can gather data from the environment. This information can be used by the model to change or calibrate its behavior. This data is gathered using electronic sensors, which can measure a wide range of phenomena: temperature, light, touch (see pictures below), pH, chemical concentration, pressure, etc. See the [Gogo docs here](https://docs.gogoboard.org/#/en/sensor/sensor-set) for info on the the sensors that are included with a GoGo board kit.
 
 The second mode of interaction between NetLogo and the physical world is the control of output devices, or "actuators" - motors, light bulbs (see pictures below), LEDs, and more complex devices that include these outputs such as toys, remote controlled cars, electrical appliances, and automated laboratory equipment. See the [Using Output Ports](https://docs.gogoboard.org/#/en/04-output) section of the GoGo docs for more info.
 
 
-The GoGo board also comes with [Terminal Connectors](https://docs.gogoboard.org/#/en/sensor/sensor-set?id=terminal-connector-) to wire in additional sensor that don't come included. Additional sensors and actuators can be found through online retailers such as [Digikey](http://www.digikey.com/), [Mouser](http://www.mouser.com/), [Phidgets](http://www.phidgets.com/), [Spark Fun](http://www.sparkfun.com/), and [Solarbotics](http://www.solarbotics.com/). 
+The GoGo board also comes with [Terminal Connectors](https://docs.gogoboard.org/#/en/sensor/sensor-set?id=terminal-connector-) to wire in additional sensor that don't come included. Additional sensors and actuators can be found through online retailers such as [Digikey](http://www.digikey.com/), [Mouser](http://www.mouser.com/), [Phidgets](http://www.phidgets.com/), [Spark Fun](http://www.sparkfun.com/), and [Solarbotics](http://www.solarbotics.com/).
 
 ### NetLogo models
 
@@ -45,12 +45,11 @@ Gogo Boards can be purchased from the [SEED Foundation](https://www.seeedstudio
 The GoGo Board connects with the computer via the USB port. Turn the GoGo Board on using the switch behind the power connector: the board will beep twice and the red light will turn on.
 
 ### Windows
-Plug in your GoGo board and go to [https://code.gogoboard.org/](https://code.gogoboard.org/). The website should prompt you to download the gogo plugin for Windows. You can now try using the NetLogo GoGo extension. If you don't have Java installed, you will be prompted to locate your java executable. You will need to install Java to get the extension to work. We recommend using the Java 17 which is the version used by NetLogo as of NetLogo 6.3.0, installer here: [https://www.oracle.com/java/technologies/downloads/#java17](https://www.oracle.com/java/technologies/downloads/#java17). You can check which Java version your system is using by running `java -version` in the command line. 
-    
+Plug in your GoGo board and go to [https://code.gogoboard.org/](https://code.gogoboard.org/). The website should prompt you to download the gogo plugin for Windows. You can now try using the NetLogo GoGo extension. If you don't have Java installed, you will be prompted to locate your java executable. You will need to install Java to get the extension to work. We recommend using the Java 17 which is the version used by NetLogo as of NetLogo 6.3.0, installer here: [https://www.oracle.com/java/technologies/downloads/#java17](https://www.oracle.com/java/technologies/downloads/#java17). You can check which Java version your system is using by running `java -version` in the command line.
+
 ### Mac OS X
-The GoGo extension requires no special installation on Mac OS X. If you don't have Java installed, you will need to install Java 17 which is the version used by NetLogo as of NetLogo 6.3.0, installer here: [https://www.oracle.com/java/technologies/downloads/#java17](https://www.oracle.com/java/technologies/downloads/#java17). You can check which Java version your system is using by running `java -version` in the command line. 
-     
+The GoGo extension requires no special installation on Mac OS X. If you don't have Java installed, you will need to install Java 17 which is the version used by NetLogo as of NetLogo 6.3.0, installer here: [https://www.oracle.com/java/technologies/downloads/#java17](https://www.oracle.com/java/technologies/downloads/#java17). You can check which Java version your system is using by running `java -version` in the command line.
+
 ### Linux
-    
+
 Many versions of Linux require no special installation.
-    
