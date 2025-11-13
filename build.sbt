@@ -7,7 +7,7 @@ import org.nlogo.build.{ NetLogoExtension, ExtensionDocumentationPlugin }
 enablePlugins(NetLogoExtension, ExtensionDocumentationPlugin)
 
 name := "gogo"
-version := "2.1.1"
+version := "2.1.2"
 isSnapshot := true
 
 Compile / resourceDirectory := { baseDirectory.value / "resources" }
