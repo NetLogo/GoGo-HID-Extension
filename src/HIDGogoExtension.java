@@ -1,11 +1,11 @@
 package gogohid.extension;
 
-import java.lang.ProcessHandle;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.concurrent.TimeUnit;
 
 import org.nlogo.api.Argument;
@@ -195,7 +195,7 @@ public class HIDGogoExtension extends DefaultClassManager {
   // contained in a single jar.  But I don't want to make big changes like that
   // at the moment -Jeremy B January 2022
   private void bootHIDDaemon(final boolean useGoGo6) throws ExtensionException {
-    String executable = ProcessHandle.current().info().command().get();
+    String executable = Paths.get(System.getProperty("java.home"), "bin", "java").toAbsolutePath().toString();
     File gogoFile = new File(HIDGogoExtension.class.getProtectionDomain().getCodeSource().getLocation().getFile());
     Path gogoParentPath = gogoFile.toPath().getParent();
     String gogoExtensionPath = gogoParentPath.toString().replaceAll("%20", " ") + File.separator;
