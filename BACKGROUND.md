@@ -45,10 +45,12 @@ Gogo Boards can be purchased from the [SEED Foundation](https://www.seeedstudio
 The GoGo Board connects with the computer via the USB port. Turn the GoGo Board on using the switch behind the power connector: the board will beep twice and the red light will turn on.
 
 ### Windows
-Plug in your GoGo board and go to [https://code.gogoboard.org/](https://code.gogoboard.org/). The website should prompt you to download the gogo plugin for Windows. You can now try using the NetLogo GoGo extension. If you don't have Java installed, you will be prompted to locate your java executable. You will need to install Java to get the extension to work. We recommend using the Java 17 which is the version used by NetLogo as of NetLogo 6.3.0, installer here: [https://www.oracle.com/java/technologies/downloads/#java17](https://www.oracle.com/java/technologies/downloads/#java17). You can check which Java version your system is using by running `java -version` in the command line.
+
+Plug in your GoGo board and go to [https://code.gogoboard.org/](https://code.gogoboard.org/). The website should prompt you to download the gogo plugin for Windows. You can now try using the NetLogo GoGo extension.
 
 ### Mac OS X
-The GoGo extension requires no special installation on Mac OS X. If you don't have Java installed, you will need to install Java 17 which is the version used by NetLogo as of NetLogo 6.3.0, installer here: [https://www.oracle.com/java/technologies/downloads/#java17](https://www.oracle.com/java/technologies/downloads/#java17). You can check which Java version your system is using by running `java -version` in the command line.
+
+The GoGo extension requires no special installation on Mac OS X.
 
 ### Linux
 

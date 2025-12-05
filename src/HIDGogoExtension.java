@@ -1,5 +1,6 @@
 package gogohid.extension;
 
+import java.lang.ProcessHandle;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
@@ -38,7 +39,6 @@ import scala.collection.JavaConverters;
 
 public class HIDGogoExtension extends DefaultClassManager {
 
-  static final String javaLocationPropertyKey = "netlogo.extensions.gogo.javaexecutable";
   static final int NUM_SENSORS = 8;
 
   private boolean shownErrorMessage = false;
@@ -190,52 +190,12 @@ public class HIDGogoExtension extends DefaultClassManager {
   private boolean stillRunning = false;
   private boolean unloaded = false;
 
-  private String userJavaPath(String defaultJava) {
-
-    int exit = 1;
-    try {
-      List<String> command = Arrays.asList( defaultJava, "-version" );
-      Process javaCheck = new ProcessBuilder(command).start();
-      exit = javaCheck.waitFor();
-    } catch(Exception e) {
-      System.err.println("Was not able to run java default: " + e.toString());
-    }
-
-    if (org.nlogo.app.App$.MODULE$ != null && org.nlogo.app.App$.MODULE$.app() != null && exit != 0) {
-      try {
-        return FileDialog.showFiles(org.nlogo.app.App$.MODULE$.app().frame(),
-            "Please locate your java executable", java.awt.FileDialog.LOAD);
-      } catch (UserCancelException e) {
-        System.out.println("User canceled java location, using default java");
-      }
-    } else {
-      System.out.println("NetLogo is headless, using default java");
-    }
-    return defaultJava;
-  }
-
-  private String javaExecutablePath() {
-    String osName = System.getProperty("os.name").toLowerCase();
-    System.err.println(osName);
-    if (osName.contains("mac")) {
-      return userJavaPath("/usr/bin/java");
-    } else if (osName.contains("windows")) {
-      return userJavaPath("java.exe");
-    } else {
-      return userJavaPath("java");
-    }
-  }
-
   // I don't think it is necessary to run Java via a command line process, I think we
   // can just spawn a process off from this one instead since everything is now
   // contained in a single jar.  But I don't want to make big changes like that
   // at the moment -Jeremy B January 2022
   private void bootHIDDaemon(final boolean useGoGo6) throws ExtensionException {
-    System.out.println("looking for system java, override by setting property " + javaLocationPropertyKey);
-    String executable = System.getProperty(javaLocationPropertyKey);
-    if (executable == null) {
-      executable = javaExecutablePath();
-    }
+    String executable = ProcessHandle.current().info().command().get();
     File gogoFile = new File(HIDGogoExtension.class.getProtectionDomain().getCodeSource().getLocation().getFile());
     Path gogoParentPath = gogoFile.toPath().getParent();
     String gogoExtensionPath = gogoParentPath.toString().replaceAll("%20", " ") + File.separator;
@@ -260,7 +220,6 @@ public class HIDGogoExtension extends DefaultClassManager {
           }
         }
       });
-      System.setProperty(javaLocationPropertyKey, executable);
       stillRunning = true;
       os = proc.getOutputStream();
       is = proc.getInputStream();
