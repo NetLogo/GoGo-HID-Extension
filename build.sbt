@@ -29,13 +29,16 @@ netLogoPackageExtras ++= Seq(
 lazy val downloadJNA = taskKey[Unit]("Obtain the JNA '.jar' file")
 
 downloadJNA := {
-  val url    = new URL("https://repo1.maven.org/maven2/net/java/dev/jna/jna/5.8.0/jna-5.8.0.jar")
-  val urlIS  = url.openStream()
   val target = Paths.get("lib/jna.jar")
-  try {
-    Files.copy(urlIS, target, StandardCopyOption.REPLACE_EXISTING)
-  } finally {
-    urlIS.close()
+
+  if (!Files.exists(target)) {
+    val url    = new URL("https://repo1.maven.org/maven2/net/java/dev/jna/jna/5.8.0/jna-5.8.0.jar")
+    val urlIS  = url.openStream()
+    try {
+      Files.copy(urlIS, target, StandardCopyOption.REPLACE_EXISTING)
+    } finally {
+      urlIS.close()
+    }
   }
 }
 
