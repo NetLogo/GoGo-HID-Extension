@@ -10,6 +10,8 @@ name := "gogo"
 version := "2.1.2"
 isSnapshot := true
 
+scalaVersion := "3.7.0"
+
 Compile / resourceDirectory := { baseDirectory.value / "resources" }
 
 Compile / javaSource := baseDirectory.value / "src"
