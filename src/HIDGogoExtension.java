@@ -52,7 +52,7 @@ public class HIDGogoExtension extends DefaultClassManager {
           final int choice =
               new OptionPane(null, "GoGo Extension has been updated!",
                             "This model is using a primitive (gogo:" + primitiveName + ") from the old version of the GoGo extension. Use gogo-serial for older GoGo boards.",
-                            JavaConverters.asScalaBuffer(Arrays.asList(new String[] { "More Information", "Close" })).toSeq()).getSelectedIndex();
+                            CollectionConverters.asScala(Arrays.asList(new String[] { "More Information", "Close" })).toSeq()).getSelectedIndex();
           if (choice == 1) {
             break;
           }
