@@ -7,7 +7,7 @@ import org.nlogo.build.{ NetLogoExtension, ExtensionDocumentationPlugin }
 enablePlugins(NetLogoExtension, ExtensionDocumentationPlugin)
 
 name := "gogo"
-version := "2.1.2"
+version := "2.2.0"
 isSnapshot := true
 
 scalaVersion := "3.7.0"
