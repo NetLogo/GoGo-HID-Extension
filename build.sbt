@@ -1,6 +1,6 @@
 import java.io.InputStream
 import java.net.URI
-import java.nio.file.{ Files, Paths, StandardCopyOption }
+import java.nio.file.{ Files, StandardCopyOption }
 
 import org.nlogo.build.{ NetLogoExtension, ExtensionDocumentationPlugin }
 
@@ -31,7 +31,7 @@ netLogoPackageExtras ++= Seq(
 lazy val downloadJNA = taskKey[Unit]("Obtain the JNA '.jar' file")
 
 downloadJNA := {
-  val target = Paths.get("lib/jna.jar")
+  val target = (baseDirectory.value / "lib" / "jna.jar").toPath
 
   if (!Files.exists(target)) {
     val url    = new URI("https://repo1.maven.org/maven2/net/java/dev/jna/jna/5.8.0/jna-5.8.0.jar").toURL
